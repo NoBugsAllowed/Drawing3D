@@ -104,7 +104,6 @@
             this.pictureBox.Size = new System.Drawing.Size(650, 562);
             this.pictureBox.TabIndex = 1;
             this.pictureBox.TabStop = false;
-            this.pictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox_Paint);
             // 
             // MainForm
             // 
