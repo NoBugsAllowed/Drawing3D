@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -9,6 +10,8 @@ namespace Drawing3D
 {
     public class Cube : Model
     {
+        private Random rand = new Random();
+
         public Cube(float x, float y, float z, float r)
         {
             Point3D a = new Point3D(x - r, y - r, z - r);
@@ -22,20 +25,20 @@ namespace Drawing3D
             Point3D h = new Point3D(x + r, y + r, z + r);
 
             List<Triangle> trList = new List<Triangle>();
-            trList.Add(new Triangle(a, b, d));
-            trList.Add(new Triangle(a, d, c));
+            trList.Add(new Triangle(a, b, d, RandomizeColor()));
+            trList.Add(new Triangle(a, d, c, RandomizeColor()));
 
-            trList.Add(new Triangle(a, b, f));
-            trList.Add(new Triangle(a, f, e));
+            trList.Add(new Triangle(a, b, f, RandomizeColor()));
+            trList.Add(new Triangle(a, f, e, RandomizeColor()));
 
-            trList.Add(new Triangle(b, d, f));
-            trList.Add(new Triangle(d, f, h));
+            trList.Add(new Triangle(b, d, f, RandomizeColor()));
+            trList.Add(new Triangle(d, f, h, RandomizeColor()));
 
-            trList.Add(new Triangle(d, c, h));
-            trList.Add(new Triangle(c, h, g));
+            trList.Add(new Triangle(d, c, h, RandomizeColor()));
+            trList.Add(new Triangle(c, h, g, RandomizeColor()));
 
-            trList.Add(new Triangle(c, a, e));
-            trList.Add(new Triangle(c, e, g));
+            trList.Add(new Triangle(c, a, e, RandomizeColor()));
+            trList.Add(new Triangle(c, e, g, RandomizeColor()));
 
             trList.Add(new Triangle(f, h, e));
             trList.Add(new Triangle(h, e, g));
@@ -48,5 +51,8 @@ namespace Drawing3D
                 0, 0, 1, 0,
                 0, 0, 0, 1);
         }
+
+        private Color RandomizeColor() => Color.FromArgb(rand.Next() % 256, rand.Next() % 256, rand.Next() % 256);
+
     }
 }

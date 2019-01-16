@@ -22,6 +22,8 @@ namespace Drawing3D
             W = w;
         }
 
+        public override string ToString() => $"({X},{Y},{Z},{W})";
+
         public static Point3D operator*(Matrix4x4 matrix,Point3D point)
         {
             float x = matrix.M11 * point.X + matrix.M12 * point.Y + matrix.M13 * point.Z + matrix.M14 * point.W;

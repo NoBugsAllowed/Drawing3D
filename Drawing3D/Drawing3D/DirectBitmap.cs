@@ -12,11 +12,11 @@ namespace Drawing3D
     public class DirectBitmap : IDisposable
     {
         public Bitmap Bitmap { get; private set; }
-        public Int32[] Bits { get; private set; }
+        public byte[] Bits { get; private set; }
         public bool Disposed { get; private set; }
         public int Height { get; private set; }
         public int Width { get; private set; }
-        public int BackgroundArgb { get; private set; }
+        public Color BackgroundColor { get; private set; }
         public Size Size { get => Bitmap.Size; }
 
         protected GCHandle BitsHandle { get; private set; }
@@ -32,50 +32,38 @@ namespace Drawing3D
         {
             Width = width;
             Height = height;
-            Bits = new Int32[width * height];
+            Bits = new byte[4 * width * height];
             BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
             Bitmap = new Bitmap(width, height, width * 4, PixelFormat.Format32bppPArgb, BitsHandle.AddrOfPinnedObject());
-            BackgroundArgb = background.ToArgb();
+            BackgroundColor = background;
         }
 
         //We assume coordinates are correct
         public void SetPixel(int x, int y, Color colour)
         {
-            int index = x + (y * Width);
-            if (index < 0 || index >= Bits.Length)
-                return;
-            int col = colour.ToArgb();
-
-            Bits[index] = col;
-        }
-        public void SetPixel(int x, int y, int argb)
-        {
-            int index = x + (y * Width);
-            if (index < 0 || index >= Bits.Length)
-                return;
-            Bits[index] = argb;
+            int index = (x + (y * Width)) * 4;
+            Bits[index] = colour.A;
+            Bits[index + 1] = colour.R;
+            Bits[index + 2] = colour.G;
+            Bits[index + 3] = colour.B;
         }
 
         public Color GetPixel(int x, int y)
         {
-            int index = x + (y * Width);
-            int col = Bits[index];
-            Color result = Color.FromArgb(col);
+            int index = (x + (y * Width)) * 4;
+            Color result = Color.FromArgb(Bits[index], Bits[index + 1], Bits[index + 2], Bits[index + 3]);
 
             return result;
         }
 
-        public int GetPixelArgb(int x, int y)
-        {
-            int index = x + (y * Width);
-            return Bits[index];
-        }
-
         public void Clear()
         {
-            for (int i = 0; i < Bits.Length; i++)
+            for (int i = 0; i < Bits.Length; i+=4)
             {
-                Bits[i] = BackgroundArgb;
+                Bits[i] = BackgroundColor.A;
+                Bits[i+1] = BackgroundColor.R;
+                Bits[i+2] = BackgroundColor.G;
+                Bits[i+3] = BackgroundColor.B;
             }
         }
 

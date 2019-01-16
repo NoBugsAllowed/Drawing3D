@@ -11,15 +11,25 @@ namespace Drawing3D
     {
         public List<Triangle> Triangles { get; set; }
         public Matrix4x4 ModelMatrix;
+        public Mesh Mesh { get; set; }
 
         public Model() { Triangles = new List<Triangle>(); }
-        public Model(List<Triangle> triangles)
+        //public Model(List<Triangle> triangles)
+        //{
+        //    Triangles = triangles;
+        //    ModelMatrix = new Matrix4x4(1, 0, 0, 0,
+        //        0, 1, 0, 0,
+        //        0, 0, 1, 0,
+        //        0, 0, 0, 1);
+        //}
+        public Model(Mesh mesh)
         {
-            Triangles = triangles;
+            Mesh = mesh;
             ModelMatrix = new Matrix4x4(1, 0, 0, 0,
                 0, 1, 0, 0,
                 0, 0, 1, 0,
                 0, 0, 0, 1);
         }
+
     }
 }
