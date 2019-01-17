@@ -62,6 +62,7 @@
     </Compile>
     <Compile Include="Line.cs" />
     <Compile Include="Matrix.cs" />
+    <Compile Include="MatrixTransform.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="Point3D.cs" />

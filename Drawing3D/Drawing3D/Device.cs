@@ -53,9 +53,8 @@ namespace Drawing3D
             depthBuffer = new float[bmp.Width * bmp.Height];
         }
 
-        public void Clear(byte r, byte g, byte b, byte a)
+        public void Clear(byte r=0, byte g=0, byte b=0, byte a=255)
         {
-            //bitmap.Clear();
             for (var index = 0; index < backBuffer.Length; index += 4)
             {
                 backBuffer[index] = b;
@@ -76,56 +75,15 @@ namespace Drawing3D
         //}
         public void DisplaySceneOnBitmap(Camera camera, Model model)
         {
-            Clear(255, 255, 255, 255);
+            Clear();
             Render(camera, model);
             Present();
         }
 
         public void Render(Camera camera, Model model)
         {
-            Matrix4x4 matrix = camera.ProjectionMatrix * camera.ViewMatrix * model.ModelMatrix;
-            //foreach (Triangle tr in model.Triangles)
-            //{
-            //    //Point3D p1 = VertexShader(camera, model.ModelMatrix, tr.Vertices[0]);
-            //    //Point3D p2 = VertexShader(camera, model.ModelMatrix, tr.Vertices[1]);
-            //    //Point3D p3 = VertexShader(camera, model.ModelMatrix, tr.Vertices[2]);
-
-            //    Point3D p1 = matrix * tr.Vertices[0];
-            //    Point3D p2 = matrix * tr.Vertices[1];
-            //    Point3D p3 = matrix * tr.Vertices[2];
-
-            //    p1.X = (int)(((p1.X / p1.W) + 1) * renderWidth / 2);
-            //    p1.Y = (int)(((p1.Y / p1.W) + 1) * renderHeight / 2);
-
-            //    p2.X = (int)(((p2.X / p2.W) + 1) * renderWidth / 2);
-            //    p2.Y = (int)(((p2.Y / p2.W) + 1) * renderHeight / 2);
-
-            //    p3.X = (int)(((p3.X / p3.W) + 1) * renderWidth / 2);
-            //    p3.Y = (int)(((p3.Y / p3.W) + 1) * renderHeight / 2);
-
-            //    FillTriangle(p1, p2, p3, tr.Color);
-
-            //    //DrawLine(p1, p2, Color.Black);
-            //    //DrawLine(p1, p3, Color.Black);
-            //    //DrawLine(p2, p3, Color.Black);
-            //}
-            //Parallel.ForEach(model.Triangles, tr =>
-            // {
-            //     Point3D p1 = matrix * tr.Vertices[0];
-            //     Point3D p2 = matrix * tr.Vertices[1];
-            //     Point3D p3 = matrix * tr.Vertices[2];
-
-            //     p1.X = (int)(((p1.X / p1.W) + 1) * renderWidth / 2);
-            //     p1.Y = (int)(((p1.Y / p1.W) + 1) * renderHeight / 2);
-
-            //     p2.X = (int)(((p2.X / p2.W) + 1) * renderWidth / 2);
-            //     p2.Y = (int)(((p2.Y / p2.W) + 1) * renderHeight / 2);
-
-            //     p3.X = (int)(((p3.X / p3.W) + 1) * renderWidth / 2);
-            //     p3.Y = (int)(((p3.Y / p3.W) + 1) * renderHeight / 2);
-
-            //     FillTriangle(p1, p2, p3, tr.Color);
-            // });
+            //Matrix4x4 matrix = camera.ProjectionMatrix * camera.ViewMatrix * model.ModelMatrix;
+            Matrix4x4 matrix = camera.ProjectionMatrix * camera.ViewMatrix * MatrixTransform.RotationX(model.Mesh.Rotation.X) * MatrixTransform.RotationY(model.Mesh.Rotation.Y) * MatrixTransform.RotationZ(model.Mesh.Rotation.Z);
 
             Parallel.ForEach(model.Mesh.Faces, face =>
             {
@@ -167,15 +125,10 @@ namespace Drawing3D
 
             depthBuffer[index] = z;
 
-            // Odwrotnie?
             backBuffer[index4] = col.B;
             backBuffer[index4 + 1] = col.G;
             backBuffer[index4 + 2] = col.R;
             backBuffer[index4 + 3] = col.A;
-            //backBuffer[index4] = col.A;
-            //backBuffer[index4+1] = col.R;
-            //backBuffer[index4+2] = col.G;
-            //backBuffer[index4+3] = col.B;
         }
 
         public void Present()
@@ -184,7 +137,6 @@ namespace Drawing3D
             {
                 stream.Write(backBuffer, 0, backBuffer.Length);
             }
-            //pictureBox.Refresh();
             pictureBox.Image = Bitmap;
         }
 
@@ -224,206 +176,9 @@ namespace Drawing3D
             }
         }
 
-        //public void FillTriangle(Point3D p1, Point3D p2, Point3D p3)
-        //{
-        //    Point3D down = p1, mid = p2, up = p3, tmp;
-        //    if (down.Y > up.Y)
-        //    {
-        //        tmp = down;
-        //        down = up;
-        //        up = tmp;
-        //    }
-        //    if (down.Y > mid.Y)
-        //    {
-        //        tmp = down;
-        //        down = mid;
-        //        mid = tmp;
-        //    }
-        //    if (mid.Y > up.Y)
-        //    {
-        //        tmp = mid;
-        //        mid = up;
-        //        up = tmp;
-        //    }
-
-
-        //    if (down.Y == mid.Y && down.Y == up.Y)
-        //        return;
-
-        //    double m1, m2;
-        //    double x1, x2;
-
-        //    // Flat bottom
-        //    if (down.Y == mid.Y)
-        //    {
-        //        if (down.X < mid.X)
-        //        {
-        //            x1 = down.X;
-        //            x2 = mid.X;
-        //            m1 = (double)(up.X - down.X) / (up.Y - down.Y);
-        //            m2 = (double)(mid.X - up.X) / (mid.Y - up.Y);
-        //        }
-        //        else
-        //        {
-        //            x2 = down.X;
-        //            x1 = mid.X;
-        //            m2 = (double)(up.X - down.X) / (up.Y - down.Y);
-        //            m1 = (double)(mid.X - up.X) / (mid.Y - up.Y);
-        //        }
-        //    }
-        //    // Flat top
-        //    else if (mid.Y == up.Y)
-        //    {
-        //        if (mid.X > up.X)
-        //        {
-        //            tmp = mid;
-        //            mid = up;
-        //            up = tmp;
-        //        }
-
-        //        x1 = down.X;
-        //        x2 = down.X;
-        //        m2 = (double)(up.X - down.X) / (up.Y - down.Y);
-        //        m1 = (double)(mid.X - down.X) / (mid.Y - down.Y);
-
-        //        if (m1 > m2)
-        //        {
-        //            double t = m1;
-        //            m1 = m2;
-        //            m2 = t;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        x1 = down.X;
-        //        x2 = down.X;
-        //        m1 = (double)(up.X - down.X) / (up.Y - down.Y);
-        //        m2 = (double)(mid.X - down.X) / (mid.Y - down.Y);
-
-        //        if (m1 > m2)
-        //        {
-        //            double t = m1;
-        //            m1 = m2;
-        //            m2 = t;
-        //        }
-        //    }
-
-        //    //for (int y = (int)down.Y + 1; y < up.Y; y++)
-        //    //{
-        //    //    //Update X
-        //    //    x1 += m1;
-        //    //    x2 += m2;
-
-        //    //    var gradient1 = down.Y != up.Y ? (y - down.Y) / (up.Y - down.Y) : 1;
-        //    //    var gradient2 = down.Y != mid.Y ? (y - down.Y) / (mid.Y - down.Y) : 1;
-
-        //    //    int sx = (int)Interpolate(down.X, pb.X, gradient1);
-        //    //    int ex = (int)Interpolate(pc.X, pd.X, gradient2);
-
-        //    //    // starting Z & ending Z
-        //    //    float z1 = Interpolate(pa.Z, pb.Z, gradient1);
-        //    //    float z2 = Interpolate(pc.Z, pd.Z, gradient2);
-
-        //    //    if (y >= renderHeight)
-        //    //        return;
-
-        //    //    if (y >= 0)
-        //    //    {
-        //    //        if (y == mid.Y)
-        //    //        {
-        //    //            if (Math.Abs(mid.X - x1) < Math.Abs(mid.X - x2))
-        //    //                m1 = (double)(up.X - mid.X) / (up.Y - mid.Y);
-        //    //            else
-        //    //                m2 = (double)(up.X - mid.X) / (up.Y - mid.Y);
-        //    //        }
-        //    //        for (int j = Math.Max((int)x1, 0); j < Math.Min((int)x2, renderWidth); j++)
-        //    //        {
-        //    //            bitmap.SetPixel(j, y, Color.Red);
-        //    //        }
-        //    //    }
-        //    //}
-
-        //    float gradient1, gradient2;
-        //    int y = (int)down.Y + 1;
-        //    for (; y < mid.Y; y++)
-        //    {
-        //        //Update X
-        //        x1 += m1;
-        //        x2 += m2;
-
-        //        gradient1 = down.Y != up.Y ? (y - down.Y) / (up.Y - down.Y) : 1;
-        //        gradient2 = down.Y != mid.Y ? (y - down.Y) / (mid.Y - down.Y) : 1;
-
-        //        // starting Z & ending Z
-        //        float z1 = Interpolate(down.Z, up.Z, gradient1);
-        //        float z2 = Interpolate(down.Z, mid.Z, gradient2);
-
-        //        if (y >= renderHeight)
-        //            return;
-
-        //        if (y >= 0)
-        //        {
-        //            for (int j = Math.Max((int)x1, 0); j < Math.Min((int)x2, renderWidth); j++)
-        //            {
-        //                bitmap.SetPixel(j, y, Color.Red);
-        //            }
-        //        }
-        //    }
-        //    if (Math.Abs(mid.X - x1) < Math.Abs(mid.X - x2))
-        //        m1 = (double)(up.X - mid.X) / (up.Y - mid.Y);
-        //    else
-        //        m2 = (double)(up.X - mid.X) / (up.Y - mid.Y);
-
-        //    for (; y < mid.Y; y++)
-        //    {
-        //        //Update X
-        //        x1 += m1;
-        //        x2 += m2;
-
-        //        var gradient1 = down.Y != up.Y ? (y - down.Y) / (up.Y - down.Y) : 1;
-        //        var gradient2 = down.Y != mid.Y ? (y - down.Y) / (mid.Y - down.Y) : 1;
-
-        //        int sx = (int)Interpolate(down.X, pb.X, gradient1);
-        //        int ex = (int)Interpolate(pc.X, pd.X, gradient2);
-
-        //        // starting Z & ending Z
-        //        float z1 = Interpolate(pa.Z, pb.Z, gradient1);
-        //        float z2 = Interpolate(pc.Z, pd.Z, gradient2);
-
-        //        if (y >= renderHeight)
-        //            return;
-
-        //        if (y >= 0)
-        //        {
-        //            for (int j = Math.Max((int)x1, 0); j < Math.Min((int)x2, renderWidth); j++)
-        //            {
-        //                bitmap.SetPixel(j, y, Color.Red);
-        //            }
-        //        }
-        //    }
-        //}
-
         public void FillTriangle(Point3D p1, Point3D p2, Point3D p3, Color col)
         {
             Point3D down = p1, mid = p2, up = p3, tmp;
-            //if (down.Y > up.Y)
-            //{
-            //    tmp = down;
-            //    down = up;
-            //    up = tmp;
-            //}
-            //if (down.Y > mid.Y)
-            //{
-            //    tmp = down;
-            //    down = mid;
-            //    mid = tmp;
-            //}
-            //if (mid.Y > up.Y)
-            //{
-            //    tmp = mid;
-            //    mid = up;
-            //    up = tmp;
-            //}
             if (down.Y > mid.Y)
             {
                 tmp = mid;
@@ -507,20 +262,15 @@ namespace Drawing3D
 
         public void ProcessScanLine(int y, Point3D pa, Point3D pb, Point3D pc, Point3D pd, Color color)
         {
-            // Thanks to current Y, we can compute the gradient to compute others values like
-            // the starting X (sx) and ending X (ex) to draw between
-            // if pa.Y == pb.Y or pc.Y == pd.Y, gradient is forced to 1
             var gradient1 = pa.Y != pb.Y ? (y - pa.Y) / (pb.Y - pa.Y) : 1;
             var gradient2 = pc.Y != pd.Y ? (y - pc.Y) / (pd.Y - pc.Y) : 1;
 
             int sx = (int)Interpolate(pa.X, pb.X, gradient1);
             int ex = (int)Interpolate(pc.X, pd.X, gradient2);
 
-            // starting Z & ending Z
             float z1 = Interpolate(pa.Z, pb.Z, gradient1);
             float z2 = Interpolate(pc.Z, pd.Z, gradient2);
 
-            // drawing a line from left (sx) to right (ex) 
             int xMax = Math.Min(renderWidth, ex);
             for (int x = Math.Max(0, sx); x < xMax; x++)
             {
@@ -531,14 +281,10 @@ namespace Drawing3D
             }
         }
 
-        // Loading the JSON file in an asynchronous manner
-        public Mesh[] LoadJSONFile(string path)
+        public Mesh[] LoadJSONFile(string path, Color color)
         {
-            //var triangles = new List<Triangle>();
             var meshes = new List<Mesh>();
             Random rand = new Random();
-            //var file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(fileName);
-            //var data = await Windows.Storage.FileIO.ReadTextAsync(file);
             var data = File.ReadAllText(path,Encoding.UTF8);
             dynamic jsonObject = Newtonsoft.Json.JsonConvert.DeserializeObject(data);
 
@@ -588,6 +334,7 @@ namespace Drawing3D
                     var b = (int)indicesArray[index * 3 + 1].Value;
                     var c = (int)indicesArray[index * 3 + 2].Value;
                     mesh.Faces[index] = new Face { A = a, B = b, C = c, Color = Color.FromArgb(rand.Next() % 256, rand.Next() % 256, rand.Next() % 256) };
+                    //mesh.Faces[index] = new Face { A = a, B = b, C = c, Color = color };
                 }
 
                 // Getting the position you've set in Blender
@@ -595,67 +342,7 @@ namespace Drawing3D
                 mesh.Position = new Point3D((float)position[0].Value, (float)position[1].Value, (float)position[2].Value);
                 meshes.Add(mesh);
             }
-            //for (var meshIndex = 0; meshIndex < jsonObject.meshes.Count; meshIndex++)
-            //{
-            //    var verticesArray = jsonObject.meshes[meshIndex].vertices;
-            //    // Faces
-            //    var indicesArray = jsonObject.meshes[meshIndex].indices;
-
-            //    var uvCount = jsonObject.meshes[meshIndex].uvCount.Value;
-            //    var verticesStep = 1;
-
-            //    // Depending of the number of texture's coordinates per vertex
-            //    // we're jumping in the vertices array  by 6, 8 & 10 windows frame
-            //    switch ((int)uvCount)
-            //    {
-            //        case 0:
-            //            verticesStep = 6;
-            //            break;
-            //        case 1:
-            //            verticesStep = 8;
-            //            break;
-            //        case 2:
-            //            verticesStep = 10;
-            //            break;
-            //    }
-
-            //    // the number of interesting vertices information for us
-            //    var verticesCount = verticesArray.Count / verticesStep;
-            //    // number of faces is logically the size of the array divided by 3 (A, B, C)
-            //    var facesCount = indicesArray.Count / 3;
-            //    //var mesh = new Mesh(jsonObject.meshes[meshIndex].name.Value, verticesCount, facesCount);
-
-            //    Point3D a, b, c;
-            //    float x, y, z;
-            //    // Filling the Vertices array of our mesh first
-            //    x = (float)verticesArray[0].Value;
-            //    y = (float)verticesArray[1].Value;
-            //    z = (float)verticesArray[2].Value;
-            //    a = new Point3D(x, y, z);
-            //    x = (float)verticesArray[3].Value;
-            //    y = (float)verticesArray[4].Value;
-            //    z = (float)verticesArray[5].Value;
-            //    b = new Point3D(x, y, z);
-            //    x = (float)verticesArray[6].Value;
-            //    y = (float)verticesArray[7].Value;
-            //    z = (float)verticesArray[8].Value;
-            //    c = new Point3D(x, y, z);
-
-            //    // Then filling the Faces array
-            //    //for (var index = 0; index < facesCount; index++)
-            //    //{
-            //    //    var a = (int)indicesArray[index * 3].Value;
-            //    //    var b = (int)indicesArray[index * 3 + 1].Value;
-            //    //    var c = (int)indicesArray[index * 3 + 2].Value;
-            //    //    mesh.Faces[index] = new Face { A = a, B = b, C = c };
-            //    //}
-
-            //    // Getting the position you've set in Blender
-            //    var position = jsonObject.meshes[meshIndex].position;
-            //    //mesh.Position = new Vector3((float)position[0].Value, (float)position[1].Value, (float)position[2].Value);
-            //    triangles.Add(new Triangle(a, b, c, Color.FromArgb(rand.Next() % 256, rand.Next() % 256, rand.Next() % 256)));
-            //}
-            //return new Model(triangles);
+            
             return meshes.ToArray();
         }
     }

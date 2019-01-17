@@ -20,6 +20,8 @@ namespace Drawing3D
             Vertices = new Point3D[verticesCount];
             Faces = new Face[facesCount];
             Name = name;
+            Position = new Point3D(0, 0, 0);
+            Rotation = new Point3D(0, 0, 0);
         }
     }
 

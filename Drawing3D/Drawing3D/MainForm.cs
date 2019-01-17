@@ -18,6 +18,7 @@ namespace Drawing3D
         public Camera Camera { get; set; }
         public Model Figure { get; set; } = null;
         public float Angle { get; set; }
+        public int temp = 0;
         private System.Timers.Timer rotateModelTimer;
 
         public MainForm()
@@ -31,24 +32,54 @@ namespace Drawing3D
             Camera = new Camera((int)numericUpDown.Value, (float)pictureBox.Height / pictureBox.Width);
 
             //Figure = new Cube(0.5f, 0.85f, 0.5f, 0.25f);
-            Mesh[] mesh = RenderDevice.LoadJSONFile("torus.babylon");
+            Mesh[] mesh = RenderDevice.LoadJSONFile("monkey.babylon", Color.Wheat);
             Figure = new Model(mesh[0]);
 
             Angle = 0;
 
             rotateModelTimer = new System.Timers.Timer();
-            rotateModelTimer.Interval = 10;
+            rotateModelTimer.Interval = 20;
             rotateModelTimer.Elapsed += (s, e) =>
             {
-                Angle += 0.05f;
+                Angle += 0.08f;
                 UpdateModelMatrix();
+                switch (temp)
+                {
+                    case 0:
+                        {
+                            Figure.Mesh.Rotation.X += 0.02f;
+                            if (Figure.Mesh.Rotation.X >= 1.5f)
+                                temp++;
+                            break;
+                        }
+                    case 1:
+                        {
+                            Figure.Mesh.Rotation.Y += 0.02f;
+                            if (Figure.Mesh.Rotation.Y >= 1.5f)
+                                temp++;
+                            break;
+                        }
+                    case 2:
+                        {
+                            Figure.Mesh.Rotation.Z += 0.02f;
+                            if (Figure.Mesh.Rotation.Z >= 1.5f)
+                            {
+                                temp = 0;
+                                Figure.Mesh.Rotation = new Point3D(0, 0, 0);
+                            }
+                            break;
+                        }
+                }
+
                 RenderDevice.DisplaySceneOnBitmap(Camera, Figure);
             };
-            rotateModelTimer.Start();
+            //rotateModelTimer.Start();
             UpdateModelMatrix();
+            Figure.Mesh.Rotation = new Point3D(1.5f, -1.5f, 0);
 
             pictureBox.Image = RenderDevice.Bitmap;
 
+            RenderDevice.DisplaySceneOnBitmap(Camera, Figure);
             //RenderDevice.Clear(255, 255, 255, 255);
             //RenderDevice.Render(Camera, Figure);
             //RenderDevice.Present();
@@ -186,7 +217,7 @@ namespace Drawing3D
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
             Camera.ChangeFov((int)(sender as NumericUpDown).Value);
-            RenderDevice.DisplaySceneOnBitmap(Camera,Figure);
+            RenderDevice.DisplaySceneOnBitmap(Camera, Figure);
         }
     }
     class Edge : IComparable
