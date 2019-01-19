@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Numerics;
+using System.IO;
 
 namespace Drawing3D
 {
@@ -31,9 +32,14 @@ namespace Drawing3D
 
             Camera = new Camera((int)numericUpDown.Value, (float)pictureBox.Height / pictureBox.Width);
 
-            //Figure = new Cube(0.5f, 0.85f, 0.5f, 0.25f);
-            Mesh[] mesh = RenderDevice.LoadJSONFile("monkey.babylon", Color.Wheat);
+            // Układ lewoskrętny
+            Camera.Position = new Point3D(0, 0, -5f);
+            Camera.Target = new Point3D(0, 0, 0);
+            Camera.Up = new Point3D(0, 1, 0);
+
+            Mesh[] mesh = LoadJSONFile("monkey.babylon", Color.Wheat);
             Figure = new Model(mesh[0]);
+            Figure.Mesh.Position = new Point3D(0, 0, 0);
 
             Angle = 0;
 
@@ -43,39 +49,47 @@ namespace Drawing3D
             {
                 Angle += 0.08f;
                 UpdateModelMatrix();
+                //Figure.Mesh.Position.X += 0.02f;
+                //Figure.Mesh.Position.Y += 0.02f;
+
+                //Figure.Mesh.Rotation.Y += 0.02f;
                 switch (temp)
                 {
+                    //case 0:
+                    //    {
+                    //        Figure.Mesh.Rotation.X += 0.02f;
+                    //        if (Figure.Mesh.Rotation.X >= 1.5f)
+                    //            temp++;
+                    //        break;
+                    //    }
+                    //case 1:
+                    //    {
+                    //        Figure.Mesh.Rotation.Y += 0.02f;
+                    //        if (Figure.Mesh.Rotation.Y >= 1.5f)
+                    //            temp=0;
+                    //        break;
+                    //    }
                     case 0:
                         {
-                            Figure.Mesh.Rotation.X += 0.02f;
-                            if (Figure.Mesh.Rotation.X >= 1.5f)
+                            Camera.Position.X += 0.1f;
+                            if (Camera.Position.X >= 5f)
                                 temp++;
                             break;
                         }
                     case 1:
                         {
-                            Figure.Mesh.Rotation.Y += 0.02f;
-                            if (Figure.Mesh.Rotation.Y >= 1.5f)
-                                temp++;
-                            break;
-                        }
-                    case 2:
-                        {
-                            Figure.Mesh.Rotation.Z += 0.02f;
-                            if (Figure.Mesh.Rotation.Z >= 1.5f)
-                            {
+                            Camera.Position.X -= 0.1f;
+                            if (Camera.Position.X <= -5f)
                                 temp = 0;
-                                Figure.Mesh.Rotation = new Point3D(0, 0, 0);
-                            }
                             break;
                         }
                 }
 
                 RenderDevice.DisplaySceneOnBitmap(Camera, Figure);
             };
-            //rotateModelTimer.Start();
+            rotateModelTimer.Start();
             UpdateModelMatrix();
-            Figure.Mesh.Rotation = new Point3D(1.5f, -1.5f, 0);
+            //Figure.Mesh.Rotation = new Point3D(1.5f, -1.5f, 0);
 
             pictureBox.Image = RenderDevice.Bitmap;
 
@@ -93,116 +107,6 @@ namespace Drawing3D
             Figure.ModelMatrix.M22 = (float)Math.Cos(Angle);
         }
 
-        //private void FillTriangle(DirectBitmap bmp, Point3D p1, Point3D p2, Point3D p3)
-        //{
-        //    Point3D down = p1, mid = p2, up = p3, tmp;
-        //    if(down.Y>up.Y)
-        //    {
-        //        tmp = down;
-        //        down = up;
-        //        up = tmp;
-        //    }
-        //    if(down.Y>mid.Y)
-        //    {
-        //        tmp = down;
-        //        down = mid;
-        //        mid = tmp;
-        //    }
-        //    if(mid.Y>up.Y)
-        //    {
-        //        tmp = mid;
-        //        mid = up;
-        //        up = tmp;
-        //    }
-
-
-        //    if (down.Y == mid.Y && down.Y == up.Y)
-        //        return;
-
-        //    double m1, m2;
-        //    double x1, x2;
-
-        //    // Flat bottom
-        //    if (down.Y == mid.Y)
-        //    {
-        //        if(down.X<mid.X)
-        //        {
-        //            x1 = down.X;
-        //            x2 = mid.X;
-        //            m1 = (double)(up.X - down.X) / (up.Y - down.Y);
-        //            m2 = (double)(mid.X - up.X) / (mid.Y - up.Y);
-        //        }
-        //        else
-        //        {
-        //            x2 = down.X;
-        //            x1 = mid.X;
-        //            m2 = (double)(up.X - down.X) / (up.Y - down.Y);
-        //            m1 = (double)(mid.X - up.X) / (mid.Y - up.Y);
-        //        }
-        //    }
-        //    // Flat top
-        //    else if(mid.Y==up.Y)
-        //    {
-        //        if (mid.X > up.X)
-        //        {
-        //            tmp = mid;
-        //            mid = up;
-        //            up = tmp;
-        //        }
-
-        //        x1 = down.X;
-        //        x2 = down.X;
-        //        m2 = (double)(up.X - down.X) / (up.Y - down.Y);
-        //        m1 = (double)(mid.X - down.X) / (mid.Y - down.Y);
-
-        //        if (m1 > m2)
-        //        {
-        //            double t = m1;
-        //            m1 = m2;
-        //            m2 = t;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        x1 = down.X;
-        //        x2 = down.X;
-        //        m1 = (double)(up.X - down.X) / (up.Y - down.Y);
-        //        m2 = (double)(mid.X - down.X) / (mid.Y - down.Y);
-
-        //        if (m1 > m2)
-        //        {
-        //            double t = m1;
-        //            m1 = m2;
-        //            m2 = t;
-        //        }
-        //    }
-
-        //    for (int y = (int)down.Y + 1; y < up.Y; y++)
-        //    {
-        //        //Update X, sort edges
-        //        x1 += m1;
-        //        x2 += m2;
-
-        //        if (y >= pictureBox.Height)
-        //            return;
-
-        //        if (y >= 0)
-        //        {
-        //            if (y == mid.Y)
-        //            {
-        //                if (Math.Abs(mid.X-x1)<Math.Abs(mid.X-x2))
-        //                    m1 = (double)(up.X - mid.X) / (up.Y - mid.Y);
-        //                else
-        //                    m2 = (double)(up.X - mid.X) / (up.Y - mid.Y);
-        //            }
-        //            for (int j = Math.Max((int)x1, 0); j < Math.Min((int)x2, pictureBox.Width); j++)
-        //            {
-        //                bmp.SetPixel(j, y, Color.Red);
-        //            }
-        //        }
-        //    }
-        //}
-
         private void Form1_SizeChanged(object sender, EventArgs e)
         {
             if (Figure != null)
@@ -218,6 +122,79 @@ namespace Drawing3D
         {
             Camera.ChangeFov((int)(sender as NumericUpDown).Value);
             RenderDevice.DisplaySceneOnBitmap(Camera, Figure);
+        }
+
+        private Mesh[] LoadJSONFile(string path, Color color)
+        {
+            var meshes = new List<Mesh>();
+            Random rand = new Random();
+            var data = File.ReadAllText(path, Encoding.UTF8);
+            dynamic jsonObject = Newtonsoft.Json.JsonConvert.DeserializeObject(data);
+
+            for (var meshIndex = 0; meshIndex < jsonObject.meshes.Count; meshIndex++)
+            {
+                var verticesArray = jsonObject.meshes[meshIndex].vertices;
+                // Faces
+                var indicesArray = jsonObject.meshes[meshIndex].indices;
+
+                var uvCount = jsonObject.meshes[meshIndex].uvCount.Value;
+                var verticesStep = 1;
+
+                // Depending of the number of texture's coordinates per vertex
+                // we're jumping in the vertices array  by 6, 8 & 10 windows frame
+                switch ((int)uvCount)
+                {
+                    case 0:
+                        verticesStep = 6;
+                        break;
+                    case 1:
+                        verticesStep = 8;
+                        break;
+                    case 2:
+                        verticesStep = 10;
+                        break;
+                }
+
+                // the number of interesting vertices information for us
+                var verticesCount = verticesArray.Count / verticesStep;
+                // number of faces is logically the size of the array divided by 3 (A, B, C)
+                var facesCount = indicesArray.Count / 3;
+                var mesh = new Mesh(jsonObject.meshes[meshIndex].name.Value, verticesCount, facesCount);
+
+                // Filling the Vertices array of our mesh first
+                for (var index = 0; index < verticesCount; index++)
+                {
+                    var x = (float)verticesArray[index * verticesStep].Value;
+                    var y = (float)verticesArray[index * verticesStep + 1].Value;
+                    var z = (float)verticesArray[index * verticesStep + 2].Value;
+
+                    var nx = (float)verticesArray[index * verticesStep + 3].Value;
+                    var ny = (float)verticesArray[index * verticesStep + 4].Value;
+                    var nz = (float)verticesArray[index * verticesStep + 5].Value;
+                    mesh.Vertices[index] = new Vertice()
+                    {
+                        Position = new Point3D(x, y, z),
+                        NormalVector = new Point3D(nx, ny, nz, 0)
+                    };
+                }
+
+                // Then filling the Faces array
+                for (var index = 0; index < facesCount; index++)
+                {
+                    var a = (int)indicesArray[index * 3].Value;
+                    var b = (int)indicesArray[index * 3 + 1].Value;
+                    var c = (int)indicesArray[index * 3 + 2].Value;
+                    mesh.Faces[index] = new Face { A = a, B = b, C = c, Color = Color.FromArgb(rand.Next() % 256, rand.Next() % 256, rand.Next() % 256) };
+                    //mesh.Faces[index] = new Face { A = a, B = b, C = c, Color = color };
+                }
+
+                // Getting the position you've set in Blender
+                var position = jsonObject.meshes[meshIndex].position;
+                mesh.Position = new Point3D((float)position[0].Value, (float)position[1].Value, (float)position[2].Value);
+                meshes.Add(mesh);
+            }
+
+            return meshes.ToArray();
         }
     }
     class Edge : IComparable

@@ -10,14 +10,14 @@ namespace Drawing3D
     public class Mesh
     {
         public string Name { get; set; }
-        public Point3D[] Vertices { get; private set; }
+        public Vertice[] Vertices { get; private set; }
         public Face[] Faces { get; set; }
         public Point3D Position { get; set; }
         public Point3D Rotation { get; set; }
 
         public Mesh(string name, int verticesCount, int facesCount)
         {
-            Vertices = new Point3D[verticesCount];
+            Vertices = new Vertice[verticesCount];
             Faces = new Face[facesCount];
             Name = name;
             Position = new Point3D(0, 0, 0);

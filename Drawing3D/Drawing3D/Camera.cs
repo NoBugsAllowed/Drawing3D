@@ -18,6 +18,10 @@ namespace Drawing3D
         public Matrix4x4 ProjectionMatrix;
         public Matrix4x4 ViewMatrix;
 
+        public Point3D Position { get; set; }
+        public Point3D Target { get; set; }
+        public Point3D Up { get; set; }
+
         public Camera(int fov, float a)
         {
             Fov = fov;

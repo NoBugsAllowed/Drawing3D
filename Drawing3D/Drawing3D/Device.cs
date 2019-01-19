@@ -53,7 +53,7 @@ namespace Drawing3D
             depthBuffer = new float[bmp.Width * bmp.Height];
         }
 
-        public void Clear(byte r=0, byte g=0, byte b=0, byte a=255)
+        public void Clear(byte r = 0, byte g = 0, byte b = 0, byte a = 255)
         {
             for (var index = 0; index < backBuffer.Length; index += 4)
             {
@@ -83,26 +83,93 @@ namespace Drawing3D
         public void Render(Camera camera, Model model)
         {
             //Matrix4x4 matrix = camera.ProjectionMatrix * camera.ViewMatrix * model.ModelMatrix;
-            Matrix4x4 matrix = camera.ProjectionMatrix * camera.ViewMatrix * MatrixTransform.RotationX(model.Mesh.Rotation.X) * MatrixTransform.RotationY(model.Mesh.Rotation.Y) * MatrixTransform.RotationZ(model.Mesh.Rotation.Z);
+            //Matrix4x4 matrix = camera.ProjectionMatrix * camera.ViewMatrix * MatrixTransform.RotationX(model.Mesh.Rotation.X) * MatrixTransform.RotationY(model.Mesh.Rotation.Y) * MatrixTransform.RotationZ(model.Mesh.Rotation.Z);
+            Matrix4x4 projection = MatrixTransform.Prespective(0.8f, (float)renderHeight / renderWidth, 0.01f, 1.0f);
+            Matrix4x4 view = MatrixTransform.LookAt(camera);
+            Matrix4x4 matrix = MatrixTransform.Translation(model.Mesh.Position) * MatrixTransform.RotationX(model.Mesh.Rotation.X) * MatrixTransform.RotationY(model.Mesh.Rotation.Y) * MatrixTransform.RotationZ(model.Mesh.Rotation.Z);
 
-            Parallel.ForEach(model.Mesh.Faces, face =>
+            foreach(Face face in model.Mesh.Faces)
             {
-                Point3D p1 = matrix * model.Mesh.Vertices[face.A];
-                Point3D p2 = matrix * model.Mesh.Vertices[face.B];
-                Point3D p3 = matrix * model.Mesh.Vertices[face.C];
+                Vertice v1 = model.Mesh.Vertices[face.A];
+                Vertice v2 = model.Mesh.Vertices[face.B];
+                Vertice v3 = model.Mesh.Vertices[face.C];
 
+                v1.CalculateCoordinates(matrix, view, projection, renderWidth, renderHeight);
+                v2.CalculateCoordinates(matrix, view, projection, renderWidth, renderHeight);
+                v3.CalculateCoordinates(matrix, view, projection, renderWidth, renderHeight);
 
-                p1.X = (int)(((p1.X / p1.W) + 1) * renderWidth / 2);
-                p1.Y = (int)(((p1.Y / p1.W) + 1) * renderHeight / 2);
+                Point3D p1 = v1.ProjectedPosition;
+                Point3D p2 = v2.ProjectedPosition;
+                Point3D p3 = v3.ProjectedPosition;
 
-                p2.X = (int)(((p2.X / p2.W) + 1) * renderWidth / 2);
-                p2.Y = (int)(((p2.Y / p2.W) + 1) * renderHeight / 2);
+                //p1.X = (int)(((p1.X) + 1) * renderWidth / 2);
+                //p1.Y = (int)(((p1.Y) + 1) * renderHeight / 2);
 
-                p3.X = (int)(((p3.X / p3.W) + 1) * renderWidth / 2);
-                p3.Y = (int)(((p3.Y / p3.W) + 1) * renderHeight / 2);
+                //p2.X = (int)(((p2.X) + 1) * renderWidth / 2);
+                //p2.Y = (int)(((p2.Y) + 1) * renderHeight / 2);
+
+                //p3.X = (int)(((p3.X) + 1) * renderWidth / 2);
+                //p3.Y = (int)(((p3.Y) + 1) * renderHeight / 2);
+                //p1.X = (int)(((p1.X / p1.W) + 1) * renderWidth / 2);
+                //p1.Y = (int)(((p1.Y / p1.W) + 1) * renderHeight / 2);
+
+                //p2.X = (int)(((p2.X / p2.W) + 1) * renderWidth / 2);
+                //p2.Y = (int)(((p2.Y / p2.W) + 1) * renderHeight / 2);
+
+                //p3.X = (int)(((p3.X / p3.W) + 1) * renderWidth / 2);
+                //p3.Y = (int)(((p3.Y / p3.W) + 1) * renderHeight / 2);
 
                 FillTriangle(p1, p2, p3, face.Color);
-            });
+            }
+            //Parallel.ForEach(model.Mesh.Faces, face =>
+            //{
+            //    Vertice v1 = model.Mesh.Vertices[face.A];
+            //    Vertice v2 = model.Mesh.Vertices[face.B];
+            //    Vertice v3 = model.Mesh.Vertices[face.C];
+
+            //    v1.CalculateCoordinates(matrix, view, projection);
+            //    v2.CalculateCoordinates(matrix, view, projection);
+            //    v3.CalculateCoordinates(matrix, view, projection);
+
+            //    Point3D p1 = v1.ProjectedPosition;
+            //    Point3D p2 = v2.ProjectedPosition;
+            //    Point3D p3 = v3.ProjectedPosition;
+
+            //    p1.X = (int)(((p1.X / p1.W) + 1) * renderWidth / 2);
+            //    p1.Y = (int)(((p1.Y / p1.W) + 1) * renderHeight / 2);
+
+            //    p2.X = (int)(((p2.X / p2.W) + 1) * renderWidth / 2);
+            //    p2.Y = (int)(((p2.Y / p2.W) + 1) * renderHeight / 2);
+
+            //    p3.X = (int)(((p3.X / p3.W) + 1) * renderWidth / 2);
+            //    p3.Y = (int)(((p3.Y / p3.W) + 1) * renderHeight / 2);
+
+            //    FillTriangle(p1, p2, p3, face.Color);
+
+            //    //Point3D p1 = matrix * model.Mesh.Vertices[face.A].Position;
+            //    //Point3D p2 = matrix * model.Mesh.Vertices[face.B].Position;
+            //    //Point3D p3 = matrix * model.Mesh.Vertices[face.C].Position;
+
+            //    //p1.X = (int)(((p1.X / p1.W) + 1) * renderWidth / 2);
+            //    //p1.Y = (int)(((p1.Y / p1.W) + 1) * renderHeight / 2);
+
+            //    //p2.X = (int)(((p2.X / p2.W) + 1) * renderWidth / 2);
+            //    //p2.Y = (int)(((p2.Y / p2.W) + 1) * renderHeight / 2);
+
+            //    //p3.X = (int)(((p3.X / p3.W) + 1) * renderWidth / 2);
+            //    //p3.Y = (int)(((p3.Y / p3.W) + 1) * renderHeight / 2);
+
+            //    //p1.X = (int)(((p1.X / p1.W) + 1) * renderWidth / 2);
+            //    //p1.Y = (int)(((p1.Y / p1.W) + 1) * renderHeight / 2);
+
+            //    //p2.X = (int)(((p2.X / p2.W) + 1) * renderWidth / 2);
+            //    //p2.Y = (int)(((p2.Y / p2.W) + 1) * renderHeight / 2);
+
+            //    //p3.X = (int)(((p3.X / p3.W) + 1) * renderWidth / 2);
+            //    //p3.Y = (int)(((p3.Y / p3.W) + 1) * renderHeight / 2);
+
+            //    //FillTriangle(p1, p2, p3, face.Color);
+            //});
         }
 
         float Clamp(float value, float min = 0, float max = 1)
@@ -222,7 +289,15 @@ namespace Drawing3D
 
             m2 = (up.X - down.X) / (up.Y - down.Y);
 
-            int yMax = Math.Min(renderHeight, (int)up.Y);
+            //Point3D ks = new Point3D((float)color.R / 255, (float)color.G / 255, (float)color.B / 255);
+            //Point3D kd = new Point3D((float)color.R / 255, (float)color.G / 255, (float)color.B / 255);
+            //Point3D ka = new Point3D((float)color.R / 255, (float)color.G / 255, (float)color.B / 255);
+
+            //Point3D DrawingPoint = (down. + Edges[1].vertex1.pw + Edges[2].vertex1.pw) / 3;
+            //var NormalVector = (Edges[0].vertex1.nw + Edges[1].vertex1.nw + Edges[2].vertex1.nw) / 3;
+            //col = PhongIllumination.Compute(ka, ks, ks, camera.Position, DrawingPoint, NormalVector, BackGroundLight, lights, 1);
+
+            int yMax = Math.Min(renderHeight - 1, (int)up.Y);
             if (m1 > m2)
             {
                 for (var y = Math.Max(0, (int)down.Y); y <= yMax; y++)
@@ -262,6 +337,10 @@ namespace Drawing3D
 
         public void ProcessScanLine(int y, Point3D pa, Point3D pb, Point3D pc, Point3D pd, Color color)
         {
+            //Point3D ks = new Point3D((float)color.R / 255, (float)color.G / 255, (float)color.B / 255);
+            //Point3D kd = new Point3D((float)color.R / 255, (float)color.G / 255, (float)color.B / 255);
+            //Point3D ka = new Point3D((float)color.R / 255, (float)color.G / 255, (float)color.B / 255);
+
             var gradient1 = pa.Y != pb.Y ? (y - pa.Y) / (pb.Y - pa.Y) : 1;
             var gradient2 = pc.Y != pd.Y ? (y - pc.Y) / (pd.Y - pc.Y) : 1;
 
@@ -271,7 +350,7 @@ namespace Drawing3D
             float z1 = Interpolate(pa.Z, pb.Z, gradient1);
             float z2 = Interpolate(pc.Z, pd.Z, gradient2);
 
-            int xMax = Math.Min(renderWidth, ex);
+            int xMax = Math.Min(renderWidth - 1, ex);
             for (int x = Math.Max(0, sx); x < xMax; x++)
             {
                 float gradient = (x - sx) / (float)(ex - sx);
@@ -279,71 +358,6 @@ namespace Drawing3D
                 float z = Interpolate(z1, z2, gradient);
                 SetPixel(x, y, z, color);
             }
-        }
-
-        public Mesh[] LoadJSONFile(string path, Color color)
-        {
-            var meshes = new List<Mesh>();
-            Random rand = new Random();
-            var data = File.ReadAllText(path,Encoding.UTF8);
-            dynamic jsonObject = Newtonsoft.Json.JsonConvert.DeserializeObject(data);
-
-            for (var meshIndex = 0; meshIndex < jsonObject.meshes.Count; meshIndex++)
-            {
-                var verticesArray = jsonObject.meshes[meshIndex].vertices;
-                // Faces
-                var indicesArray = jsonObject.meshes[meshIndex].indices;
-
-                var uvCount = jsonObject.meshes[meshIndex].uvCount.Value;
-                var verticesStep = 1;
-
-                // Depending of the number of texture's coordinates per vertex
-                // we're jumping in the vertices array  by 6, 8 & 10 windows frame
-                switch ((int)uvCount)
-                {
-                    case 0:
-                        verticesStep = 6;
-                        break;
-                    case 1:
-                        verticesStep = 8;
-                        break;
-                    case 2:
-                        verticesStep = 10;
-                        break;
-                }
-
-                // the number of interesting vertices information for us
-                var verticesCount = verticesArray.Count / verticesStep;
-                // number of faces is logically the size of the array divided by 3 (A, B, C)
-                var facesCount = indicesArray.Count / 3;
-                var mesh = new Mesh(jsonObject.meshes[meshIndex].name.Value, verticesCount, facesCount);
-
-                // Filling the Vertices array of our mesh first
-                for (var index = 0; index < verticesCount; index++)
-                {
-                    var x = (float)verticesArray[index * verticesStep].Value;
-                    var y = (float)verticesArray[index * verticesStep + 1].Value;
-                    var z = (float)verticesArray[index * verticesStep + 2].Value;
-                    mesh.Vertices[index] = new Point3D(x, y, z);
-                }
-
-                // Then filling the Faces array
-                for (var index = 0; index < facesCount; index++)
-                {
-                    var a = (int)indicesArray[index * 3].Value;
-                    var b = (int)indicesArray[index * 3 + 1].Value;
-                    var c = (int)indicesArray[index * 3 + 2].Value;
-                    mesh.Faces[index] = new Face { A = a, B = b, C = c, Color = Color.FromArgb(rand.Next() % 256, rand.Next() % 256, rand.Next() % 256) };
-                    //mesh.Faces[index] = new Face { A = a, B = b, C = c, Color = color };
-                }
-
-                // Getting the position you've set in Blender
-                var position = jsonObject.meshes[meshIndex].position;
-                mesh.Position = new Point3D((float)position[0].Value, (float)position[1].Value, (float)position[2].Value);
-                meshes.Add(mesh);
-            }
-            
-            return meshes.ToArray();
         }
     }
 }
