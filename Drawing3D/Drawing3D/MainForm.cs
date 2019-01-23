@@ -16,39 +16,35 @@ namespace Drawing3D
     {
         //public DirectBitmap Picture { get; set; }
         public Device RenderDevice { get; set; }
-        public Camera Camera { get; set; }
-        public Model Figure { get; set; } = null;
-        public float Angle { get; set; }
-        public int temp = 0;
+        public Camera StaticCamera { get; set; }
+        public Camera FocusedCamera { get; set; }
+        public Camera MovingCamera { get; set; }
         private System.Timers.Timer rotateModelTimer;
+
+        private int temp = 0;
 
         public MainForm()
         {
             InitializeComponent();
 
-            //Picture = new DirectBitmap(pictureBox.ClientSize.Width, pictureBox.ClientSize.Height);
-            //pictureBox.Image = Picture.Bitmap;
             RenderDevice = new Device(pictureBox);
 
-            Camera = new Camera((int)numericUpDown.Value, (float)pictureBox.Height / pictureBox.Width);
+            float fov = (float)(((int)numericUpDown.Value) * Math.PI / 180);
+            float a = (float)pictureBox.Height / pictureBox.Width;
 
-            // Układ lewoskrętny
-            Camera.Position = new Point3D(0, 0, -5f);
-            Camera.Target = new Point3D(0, 0, 0);
-            Camera.Up = new Point3D(0, 1, 0);
+            StaticCamera = new Camera(new Point3D(0, 0, -10f), new Point3D(0, 0, 0), new Point3D(0, 1, 0), fov, a);
 
-            Mesh[] mesh = LoadJSONFile("monkey.babylon", Color.Wheat);
-            Figure = new Model(mesh[0]);
-            Figure.Mesh.Position = new Point3D(0, 0, 0);
+            RenderDevice.Camera = StaticCamera;
 
-            Angle = 0;
+            Mesh[] mesh = LoadJSONFile("kregiel2.babylon", Color.Wheat);
+            Model monkey = new Model(mesh[0]);
+            monkey.Mesh.Position = new Point3D(0, -1.5f, 0);
+            RenderDevice.Models.Add(monkey);
 
             rotateModelTimer = new System.Timers.Timer();
-            rotateModelTimer.Interval = 20;
+            rotateModelTimer.Interval = 100;
             rotateModelTimer.Elapsed += (s, e) =>
             {
-                Angle += 0.08f;
-                UpdateModelMatrix();
                 //Figure.Mesh.Position.X += 0.02f;
                 //Figure.Mesh.Position.Y += 0.02f;
 
@@ -71,57 +67,37 @@ namespace Drawing3D
                     //    }
                     case 0:
                         {
-                            Camera.Position.X += 0.1f;
-                            if (Camera.Position.X >= 5f)
+                            StaticCamera.Position.Y += 0.5f;
+                            if (StaticCamera.Position.Z >= 25f)
                                 temp++;
                             break;
                         }
                     case 1:
                         {
-                            Camera.Position.X -= 0.1f;
-                            if (Camera.Position.X <= -5f)
+                            StaticCamera.Position.Y -= 0.3f;
+                            if (StaticCamera.Position.Y <= -5f)
                                 temp = 0;
                             break;
                         }
                 }
 
-                RenderDevice.DisplaySceneOnBitmap(Camera, Figure);
+                RenderDevice.UpdateBitmap();
             };
-            rotateModelTimer.Start();
-            UpdateModelMatrix();
-            //Figure.Mesh.Rotation = new Point3D(1.5f, -1.5f, 0);
-
+            //rotateModelTimer.Start();
             pictureBox.Image = RenderDevice.Bitmap;
 
-            RenderDevice.DisplaySceneOnBitmap(Camera, Figure);
-            //RenderDevice.Clear(255, 255, 255, 255);
-            //RenderDevice.Render(Camera, Figure);
-            //RenderDevice.Present();
-        }
-
-        public void UpdateModelMatrix()
-        {
-            Figure.ModelMatrix.M11 = (float)Math.Cos(Angle);
-            Figure.ModelMatrix.M12 = -(float)Math.Sin(Angle);
-            Figure.ModelMatrix.M21 = (float)Math.Sin(Angle);
-            Figure.ModelMatrix.M22 = (float)Math.Cos(Angle);
+            RenderDevice.UpdateBitmap();
         }
 
         private void Form1_SizeChanged(object sender, EventArgs e)
         {
-            if (Figure != null)
-            {
-                // TODO
-                //Camera.ChangeParameters((float)pictureBox.Height / pictureBox.Width);
-                //RenderDevice.SetBitmapSize(pictureBox.Width, pictureBox.Height);
-                //RenderDevice.DisplaySceneOnBitmap(Camera, Figure);
-            }
+            // TODO
         }
 
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        private void numericUpDown_ValueChanged(object sender, EventArgs e)
         {
-            Camera.ChangeFov((int)(sender as NumericUpDown).Value);
-            RenderDevice.DisplaySceneOnBitmap(Camera, Figure);
+            RenderDevice.Camera.ChangeFov((float)(((int)(sender as NumericUpDown).Value) * Math.PI / 180));
+            RenderDevice.UpdateBitmap();
         }
 
         private Mesh[] LoadJSONFile(string path, Color color)
@@ -184,8 +160,8 @@ namespace Drawing3D
                     var a = (int)indicesArray[index * 3].Value;
                     var b = (int)indicesArray[index * 3 + 1].Value;
                     var c = (int)indicesArray[index * 3 + 2].Value;
-                    mesh.Faces[index] = new Face { A = a, B = b, C = c, Color = Color.FromArgb(rand.Next() % 256, rand.Next() % 256, rand.Next() % 256) };
-                    //mesh.Faces[index] = new Face { A = a, B = b, C = c, Color = color };
+                    //mesh.Faces[index] = new Face { A = a, B = b, C = c, Color = Color.FromArgb(rand.Next() % 256, rand.Next() % 256, rand.Next() % 256) };
+                    mesh.Faces[index] = new Face { A = a, B = b, C = c, Color = color };
                 }
 
                 // Getting the position you've set in Blender
@@ -195,6 +171,33 @@ namespace Drawing3D
             }
 
             return meshes.ToArray();
+        }
+
+        private void rbShadingFlat_CheckedChanged(object sender, EventArgs e)
+        {
+            if ((sender as RadioButton).Checked)
+            {
+                RenderDevice.Shading = Shading.Flat;
+                RenderDevice.UpdateBitmap();
+            }
+        }
+
+        private void rbShadingGouraud_CheckedChanged(object sender, EventArgs e)
+        {
+            if ((sender as RadioButton).Checked)
+            {
+                RenderDevice.Shading = Shading.Gouraud;
+                RenderDevice.UpdateBitmap();
+            }
+        }
+
+        private void rbShadingPhong_CheckedChanged(object sender, EventArgs e)
+        {
+            if ((sender as RadioButton).Checked)
+            {
+                RenderDevice.Shading = Shading.Phong;
+                RenderDevice.UpdateBitmap();
+            }
         }
     }
     class Edge : IComparable

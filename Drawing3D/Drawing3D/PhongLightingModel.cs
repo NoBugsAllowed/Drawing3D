@@ -9,12 +9,11 @@ namespace Drawing3D
 {
     class PhongLightingModel
     {
-        // co to jest Ia TODO
-        public static Color CalculateColor(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, List<LightSource> lightSources, Point3D Ia, int m)
+        public static Color CalculateColor(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, List<LightSource> lightSources, Point3D backgroundLight, int m)
         {
-            float r = Ia.X * ka.X;
-            float g = Ia.Y * ka.Y;
-            float b = Ia.Z * ka.Z;
+            float r = backgroundLight.X * ka.X;
+            float g = backgroundLight.Y * ka.Y;
+            float b = backgroundLight.Z * ka.Z;
 
             foreach (LightSource l in lightSources)
             {

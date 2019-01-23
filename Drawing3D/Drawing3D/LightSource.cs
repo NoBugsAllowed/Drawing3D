@@ -12,7 +12,7 @@ namespace Drawing3D
         public (float R, float G, float B) Color { get; set; }
         public abstract (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1);
 
-        public LightSource() { Color = (255, 255, 255); }
+        public LightSource() { Color = (1, 1, 1); }
     }
 
     public class DirectionalLightSource : LightSource
@@ -26,7 +26,7 @@ namespace Drawing3D
         public DirectionalLightSource(Point3D direction, Color color)
         {
             Direction = direction;
-            Color = (color.R, color.G, color.B);
+            Color = (color.R / 255, color.G / 255, color.B / 255);
         }
 
         public override (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1)
@@ -49,6 +49,44 @@ namespace Drawing3D
             g = Color.G * (kd.Y * k + ks.Y * p);
             b = Color.B * (kd.Z * k + ks.Z * p);
 
+            return (r, g, b);
+        }
+    }
+
+    public class SpotLightSource : LightSource
+    {
+        public Point3D Position;
+        public Point3D Direction;
+        public float Focus;
+
+        public SpotLightSource(Point3D position, Point3D direction, Color color, float focus)
+        {
+            Position = position;
+            Direction = direction;
+            this.Color = (color.R / 255, color.G / 255, color.B / 255);
+            this.Focus = focus;
+        }
+
+        public override (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1)
+        {
+            Point3D positionToTargetVectior = Position - target;
+            Point3D cameraToTargetVector = cameraPosition - target;
+            Point3D li = positionToTargetVectior / positionToTargetVectior.DistanceFromOrigin();
+            Point3D v = cameraToTargetVector / cameraToTargetVector.DistanceFromOrigin();
+            Point3D ri = normal * (2 * Point3D.DotProduct(normal, li)) - li;
+
+            float r, g, b;
+
+            var tmp = Point3D.DotProduct(-Direction, li);
+            float q = Math.Max(Point3D.DotProduct(-Direction, li), 0);
+
+            Point3D Ii = new Point3D(Color.R * q, Color.G * q, Color.B * q);
+            float k = Math.Max(Point3D.DotProduct(normal, li), 0);
+            float p = (float)Math.Pow(Math.Max(Point3D.DotProduct(v, ri), 0), m);
+
+            r = Ii.X * (kd.X * k + ks.X * p);
+            g = Ii.Y * (kd.Y * k + ks.Y * p);
+            b = Ii.Z * (kd.Z * k + ks.Z * p);
             return (r, g, b);
         }
     }
