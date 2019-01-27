@@ -23,6 +23,18 @@ namespace Drawing3D
             Position = new Point3D(0, 0, 0);
             Rotation = new Point3D(0, 0, 0);
         }
+
+        public Mesh Clone()
+        {
+            Mesh mesh = new Mesh(Name, Vertices.Length, Faces.Length);
+            for (int i = 0; i < mesh.Vertices.Length; i++)
+                mesh.Vertices[i] = Vertices[i].Clone();
+            for (int i = 0; i < mesh.Faces.Length; i++)
+                mesh.Faces[i] = Faces[i];
+            mesh.Position = Position.Clone();
+            mesh.Rotation = Rotation.Clone();
+            return mesh;
+        }
     }
 
     public struct Face

@@ -9,14 +9,20 @@ namespace Drawing3D
 {
     public class Model
     {
-        public List<Triangle> Triangles { get; set; }
-        public float RotationX { get; set; }
-        public float RotationY { get; set; }
-        public float RotationZ { get; set; }
-        public Matrix4x4 ModelMatrix;
         public Mesh Mesh { get; set; }
+        public Point3D Position
+        {
+            get => Mesh.Position;
+            set { Mesh.Position = value; }
+        }
+        public Point3D Rotation
+        {
+            get => Mesh.Rotation;
+            set { Mesh.Rotation = value; }
+        }
+        public Matrix4x4 ModelMatrix;
 
-        public Model() { Triangles = new List<Triangle>(); }
+        //public Model() { Triangles = new List<Triangle>(); }
         public Model(Mesh mesh)
         {
             Mesh = mesh;

@@ -37,7 +37,7 @@ namespace Drawing3D
             m.M44 = 1;
             return m;
         }
-        public static Matrix4x4 Prespective(float fov, float a, float n, float f)
+        public static Matrix4x4 Projection(float fov, float a, float n, float f)
         {
             //n-bliższa płaszczyzna ograniczająca z-towa składowa
             //f-dalsza płaszczyzna ograniczająca z-towa składowa
@@ -45,18 +45,18 @@ namespace Drawing3D
             //fov(field of view) - kąt widzenia
             Matrix4x4 m = new Matrix4x4();
             //m.M11 = (float)(1.0f / Math.Tan(fov * 0.5f));
-            //m.M22 = (float)(m.M11 / a);
+            //m.M22 = (float)-(m.M11 / a);
             //m.M33 = (float)((-f - n) / (f - n));
             //m.M34 = (float)((-2 * f * n) / (f - n));
             //m.M43 = -1;
             m.M11 = (float)(1.0f / Math.Tan(fov * 0.5f));
-            m.M22 = (float)-(m.M11 / a);
-            m.M33 = (float)((-f - n) / (f - n));
-            m.M34 = (float)((-2 * f * n) / (f - n));
+            m.M22 = -(m.M11 / a);
+            m.M33 = (-f - n) / (f - n);
+            m.M34 = (-2 * f * n) / (f - n);
             m.M43 = -1;
             return m;
         }
-        public static Matrix4x4 LookAt(Camera c)
+        public static Matrix4x4 View(Camera c)
         {
             Matrix4x4 m = new Matrix4x4();
             Point3D tmp = (c.Position - c.Target);

@@ -28,64 +28,182 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.rbShadingPhong = new System.Windows.Forms.RadioButton();
-            this.rbShadingGouraud = new System.Windows.Forms.RadioButton();
-            this.rbShadingFlat = new System.Windows.Forms.RadioButton();
+            this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.gbLights = new System.Windows.Forms.GroupBox();
+            this.cbPointLight = new System.Windows.Forms.CheckBox();
+            this.cbReflector = new System.Windows.Forms.CheckBox();
+            this.cbDirectional = new System.Windows.Forms.CheckBox();
             this.gbCamera = new System.Windows.Forms.GroupBox();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.rbMovingCamera = new System.Windows.Forms.RadioButton();
+            this.rbFocusedCamera = new System.Windows.Forms.RadioButton();
+            this.rbStaticFrontCamera = new System.Windows.Forms.RadioButton();
             this.gbShading = new System.Windows.Forms.GroupBox();
-            this.pictureBox = new System.Windows.Forms.PictureBox();
+            this.rbShadingPhong = new System.Windows.Forms.RadioButton();
+            this.rbShadingFlat = new System.Windows.Forms.RadioButton();
+            this.rbShadingGouraud = new System.Windows.Forms.RadioButton();
             this.gbFov = new System.Windows.Forms.GroupBox();
             this.numericUpDown = new System.Windows.Forms.NumericUpDown();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            this.tableLayoutPanel1.SuspendLayout();
+            this.pictureBox = new System.Windows.Forms.PictureBox();
+            this.rbStaticBackCamera = new System.Windows.Forms.RadioButton();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
+            this.splitContainer.Panel1.SuspendLayout();
+            this.splitContainer.Panel2.SuspendLayout();
+            this.splitContainer.SuspendLayout();
+            this.tableLayoutPanel.SuspendLayout();
+            this.gbLights.SuspendLayout();
             this.gbCamera.SuspendLayout();
             this.gbShading.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.gbFov.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
             // 
-            // splitContainer1
+            // splitContainer
             // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer.Name = "splitContainer";
             // 
-            // splitContainer1.Panel1
+            // splitContainer.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.tableLayoutPanel1);
+            this.splitContainer.Panel1.Controls.Add(this.tableLayoutPanel);
             // 
-            // splitContainer1.Panel2
+            // splitContainer.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.pictureBox);
-            this.splitContainer1.Size = new System.Drawing.Size(784, 562);
-            this.splitContainer1.SplitterDistance = 130;
-            this.splitContainer1.TabIndex = 0;
+            this.splitContainer.Panel2.Controls.Add(this.pictureBox);
+            this.splitContainer.Size = new System.Drawing.Size(784, 562);
+            this.splitContainer.SplitterDistance = 130;
+            this.splitContainer.TabIndex = 0;
             // 
-            // tableLayoutPanel1
+            // tableLayoutPanel
             // 
-            this.tableLayoutPanel1.ColumnCount = 1;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.gbFov, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.gbCamera, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.gbShading, 0, 1);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(130, 562);
-            this.tableLayoutPanel1.TabIndex = 0;
+            this.tableLayoutPanel.ColumnCount = 1;
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel.Controls.Add(this.gbLights, 0, 2);
+            this.tableLayoutPanel.Controls.Add(this.gbCamera, 0, 0);
+            this.tableLayoutPanel.Controls.Add(this.gbShading, 0, 1);
+            this.tableLayoutPanel.Controls.Add(this.gbFov, 0, 3);
+            this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel.Name = "tableLayoutPanel";
+            this.tableLayoutPanel.RowCount = 4;
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel.Size = new System.Drawing.Size(130, 562);
+            this.tableLayoutPanel.TabIndex = 0;
+            // 
+            // gbLights
+            // 
+            this.gbLights.Controls.Add(this.cbPointLight);
+            this.gbLights.Controls.Add(this.cbReflector);
+            this.gbLights.Controls.Add(this.cbDirectional);
+            this.gbLights.Dock = System.Windows.Forms.DockStyle.Top;
+            this.gbLights.Location = new System.Drawing.Point(3, 222);
+            this.gbLights.Name = "gbLights";
+            this.gbLights.Size = new System.Drawing.Size(124, 86);
+            this.gbLights.TabIndex = 14;
+            this.gbLights.TabStop = false;
+            this.gbLights.Text = "Lights";
+            // 
+            // cbPointLight
+            // 
+            this.cbPointLight.AutoSize = true;
+            this.cbPointLight.Location = new System.Drawing.Point(7, 67);
+            this.cbPointLight.Name = "cbPointLight";
+            this.cbPointLight.Size = new System.Drawing.Size(72, 17);
+            this.cbPointLight.TabIndex = 2;
+            this.cbPointLight.Text = "Point light";
+            this.cbPointLight.UseVisualStyleBackColor = true;
+            this.cbPointLight.CheckedChanged += new System.EventHandler(this.cbPointLight_CheckedChanged);
+            // 
+            // cbReflector
+            // 
+            this.cbReflector.AutoSize = true;
+            this.cbReflector.Location = new System.Drawing.Point(7, 44);
+            this.cbReflector.Name = "cbReflector";
+            this.cbReflector.Size = new System.Drawing.Size(69, 17);
+            this.cbReflector.TabIndex = 1;
+            this.cbReflector.Text = "Reflector";
+            this.cbReflector.UseVisualStyleBackColor = true;
+            this.cbReflector.CheckedChanged += new System.EventHandler(this.cbReflector_CheckedChanged);
+            // 
+            // cbDirectional
+            // 
+            this.cbDirectional.AutoSize = true;
+            this.cbDirectional.Checked = true;
+            this.cbDirectional.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbDirectional.Location = new System.Drawing.Point(7, 20);
+            this.cbDirectional.Name = "cbDirectional";
+            this.cbDirectional.Size = new System.Drawing.Size(98, 17);
+            this.cbDirectional.TabIndex = 0;
+            this.cbDirectional.Text = "Directional light";
+            this.cbDirectional.UseVisualStyleBackColor = true;
+            this.cbDirectional.CheckedChanged += new System.EventHandler(this.cbDirectional_CheckedChanged);
+            // 
+            // gbCamera
+            // 
+            this.gbCamera.Controls.Add(this.rbStaticBackCamera);
+            this.gbCamera.Controls.Add(this.rbMovingCamera);
+            this.gbCamera.Controls.Add(this.rbFocusedCamera);
+            this.gbCamera.Controls.Add(this.rbStaticFrontCamera);
+            this.gbCamera.Dock = System.Windows.Forms.DockStyle.Top;
+            this.gbCamera.Location = new System.Drawing.Point(3, 3);
+            this.gbCamera.Name = "gbCamera";
+            this.gbCamera.Size = new System.Drawing.Size(124, 113);
+            this.gbCamera.TabIndex = 6;
+            this.gbCamera.TabStop = false;
+            this.gbCamera.Text = "Camera";
+            // 
+            // rbMovingCamera
+            // 
+            this.rbMovingCamera.AutoSize = true;
+            this.rbMovingCamera.Location = new System.Drawing.Point(7, 90);
+            this.rbMovingCamera.Name = "rbMovingCamera";
+            this.rbMovingCamera.Size = new System.Drawing.Size(101, 17);
+            this.rbMovingCamera.TabIndex = 2;
+            this.rbMovingCamera.Text = "Moving with ball";
+            this.rbMovingCamera.UseVisualStyleBackColor = true;
+            this.rbMovingCamera.CheckedChanged += new System.EventHandler(this.rbMovingCamera_CheckedChanged);
+            // 
+            // rbFocusedCamera
+            // 
+            this.rbFocusedCamera.AutoSize = true;
+            this.rbFocusedCamera.Location = new System.Drawing.Point(7, 66);
+            this.rbFocusedCamera.Name = "rbFocusedCamera";
+            this.rbFocusedCamera.Size = new System.Drawing.Size(97, 17);
+            this.rbFocusedCamera.TabIndex = 1;
+            this.rbFocusedCamera.Text = "Looking on ball";
+            this.rbFocusedCamera.UseVisualStyleBackColor = true;
+            this.rbFocusedCamera.CheckedChanged += new System.EventHandler(this.rbFocusedCamera_CheckedChanged);
+            // 
+            // rbStaticFrontCamera
+            // 
+            this.rbStaticFrontCamera.AutoSize = true;
+            this.rbStaticFrontCamera.Checked = true;
+            this.rbStaticFrontCamera.Location = new System.Drawing.Point(7, 20);
+            this.rbStaticFrontCamera.Name = "rbStaticFrontCamera";
+            this.rbStaticFrontCamera.Size = new System.Drawing.Size(82, 17);
+            this.rbStaticFrontCamera.TabIndex = 0;
+            this.rbStaticFrontCamera.TabStop = true;
+            this.rbStaticFrontCamera.Text = "Static (front)";
+            this.rbStaticFrontCamera.UseVisualStyleBackColor = true;
+            this.rbStaticFrontCamera.CheckedChanged += new System.EventHandler(this.rbStaticFrontCamera_CheckedChanged);
+            // 
+            // gbShading
+            // 
+            this.gbShading.Controls.Add(this.rbShadingPhong);
+            this.gbShading.Controls.Add(this.rbShadingFlat);
+            this.gbShading.Controls.Add(this.rbShadingGouraud);
+            this.gbShading.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbShading.Location = new System.Drawing.Point(3, 122);
+            this.gbShading.Name = "gbShading";
+            this.gbShading.Size = new System.Drawing.Size(124, 94);
+            this.gbShading.TabIndex = 12;
+            this.gbShading.TabStop = false;
+            this.gbShading.Text = "Shading";
             // 
             // rbShadingPhong
             // 
@@ -97,17 +215,6 @@
             this.rbShadingPhong.Text = "Phong";
             this.rbShadingPhong.UseVisualStyleBackColor = true;
             this.rbShadingPhong.CheckedChanged += new System.EventHandler(this.rbShadingPhong_CheckedChanged);
-            // 
-            // rbShadingGouraud
-            // 
-            this.rbShadingGouraud.AutoSize = true;
-            this.rbShadingGouraud.Location = new System.Drawing.Point(7, 42);
-            this.rbShadingGouraud.Name = "rbShadingGouraud";
-            this.rbShadingGouraud.Size = new System.Drawing.Size(66, 17);
-            this.rbShadingGouraud.TabIndex = 1;
-            this.rbShadingGouraud.Text = "Gouraud";
-            this.rbShadingGouraud.UseVisualStyleBackColor = true;
-            this.rbShadingGouraud.CheckedChanged += new System.EventHandler(this.rbShadingGouraud_CheckedChanged);
             // 
             // rbShadingFlat
             // 
@@ -122,81 +229,25 @@
             this.rbShadingFlat.UseVisualStyleBackColor = true;
             this.rbShadingFlat.CheckedChanged += new System.EventHandler(this.rbShadingFlat_CheckedChanged);
             // 
-            // gbCamera
+            // rbShadingGouraud
             // 
-            this.gbCamera.Controls.Add(this.radioButton3);
-            this.gbCamera.Controls.Add(this.radioButton2);
-            this.gbCamera.Controls.Add(this.radioButton1);
-            this.gbCamera.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbCamera.Location = new System.Drawing.Point(3, 3);
-            this.gbCamera.Name = "gbCamera";
-            this.gbCamera.Size = new System.Drawing.Size(124, 94);
-            this.gbCamera.TabIndex = 6;
-            this.gbCamera.TabStop = false;
-            this.gbCamera.Text = "Camera";
-            // 
-            // radioButton3
-            // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(7, 68);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(101, 17);
-            this.radioButton3.TabIndex = 2;
-            this.radioButton3.Text = "Moving with ball";
-            this.radioButton3.UseVisualStyleBackColor = true;
-            // 
-            // radioButton2
-            // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(7, 44);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(97, 17);
-            this.radioButton2.TabIndex = 1;
-            this.radioButton2.Text = "Looking on ball";
-            this.radioButton2.UseVisualStyleBackColor = true;
-            // 
-            // radioButton1
-            // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Checked = true;
-            this.radioButton1.Location = new System.Drawing.Point(7, 20);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(52, 17);
-            this.radioButton1.TabIndex = 0;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "Static";
-            this.radioButton1.UseVisualStyleBackColor = true;
-            // 
-            // gbShading
-            // 
-            this.gbShading.Controls.Add(this.rbShadingPhong);
-            this.gbShading.Controls.Add(this.rbShadingFlat);
-            this.gbShading.Controls.Add(this.rbShadingGouraud);
-            this.gbShading.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbShading.Location = new System.Drawing.Point(3, 103);
-            this.gbShading.Name = "gbShading";
-            this.gbShading.Size = new System.Drawing.Size(124, 94);
-            this.gbShading.TabIndex = 12;
-            this.gbShading.TabStop = false;
-            this.gbShading.Text = "Shading";
-            // 
-            // pictureBox
-            // 
-            this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(650, 562);
-            this.pictureBox.TabIndex = 1;
-            this.pictureBox.TabStop = false;
+            this.rbShadingGouraud.AutoSize = true;
+            this.rbShadingGouraud.Location = new System.Drawing.Point(7, 42);
+            this.rbShadingGouraud.Name = "rbShadingGouraud";
+            this.rbShadingGouraud.Size = new System.Drawing.Size(66, 17);
+            this.rbShadingGouraud.TabIndex = 1;
+            this.rbShadingGouraud.Text = "Gouraud";
+            this.rbShadingGouraud.UseVisualStyleBackColor = true;
+            this.rbShadingGouraud.CheckedChanged += new System.EventHandler(this.rbShadingGouraud_CheckedChanged);
             // 
             // gbFov
             // 
             this.gbFov.Controls.Add(this.numericUpDown);
-            this.gbFov.Dock = System.Windows.Forms.DockStyle.Top;
-            this.gbFov.Location = new System.Drawing.Point(3, 203);
+            this.gbFov.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbFov.Location = new System.Drawing.Point(3, 314);
             this.gbFov.Name = "gbFov";
-            this.gbFov.Size = new System.Drawing.Size(124, 56);
-            this.gbFov.TabIndex = 13;
+            this.gbFov.Size = new System.Drawing.Size(124, 264);
+            this.gbFov.TabIndex = 15;
             this.gbFov.TabStop = false;
             this.gbFov.Text = "Fov";
             // 
@@ -216,7 +267,7 @@
             0});
             this.numericUpDown.Name = "numericUpDown";
             this.numericUpDown.Size = new System.Drawing.Size(118, 20);
-            this.numericUpDown.TabIndex = 2;
+            this.numericUpDown.TabIndex = 3;
             this.numericUpDown.Value = new decimal(new int[] {
             60,
             0,
@@ -224,46 +275,76 @@
             0});
             this.numericUpDown.ValueChanged += new System.EventHandler(this.numericUpDown_ValueChanged);
             // 
+            // pictureBox
+            // 
+            this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox.Name = "pictureBox";
+            this.pictureBox.Size = new System.Drawing.Size(650, 562);
+            this.pictureBox.TabIndex = 1;
+            this.pictureBox.TabStop = false;
+            // 
+            // rbStaticBackCamera
+            // 
+            this.rbStaticBackCamera.AutoSize = true;
+            this.rbStaticBackCamera.Location = new System.Drawing.Point(7, 43);
+            this.rbStaticBackCamera.Name = "rbStaticBackCamera";
+            this.rbStaticBackCamera.Size = new System.Drawing.Size(85, 17);
+            this.rbStaticBackCamera.TabIndex = 3;
+            this.rbStaticBackCamera.TabStop = true;
+            this.rbStaticBackCamera.Text = "Static (back)";
+            this.rbStaticBackCamera.UseVisualStyleBackColor = true;
+            this.rbStaticBackCamera.CheckedChanged += new System.EventHandler(this.rbStaticBackCamera_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
-            this.Controls.Add(this.splitContainer1);
+            this.Controls.Add(this.splitContainer);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "MainForm";
-            this.Text = "Form1";
-            this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            this.tableLayoutPanel1.ResumeLayout(false);
+            this.Text = "Bowling";
+            this.splitContainer.Panel1.ResumeLayout(false);
+            this.splitContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
+            this.splitContainer.ResumeLayout(false);
+            this.tableLayoutPanel.ResumeLayout(false);
+            this.gbLights.ResumeLayout(false);
+            this.gbLights.PerformLayout();
             this.gbCamera.ResumeLayout(false);
             this.gbCamera.PerformLayout();
             this.gbShading.ResumeLayout(false);
             this.gbShading.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
             this.gbFov.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.SplitContainer splitContainer;
         private System.Windows.Forms.PictureBox pictureBox;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
         private System.Windows.Forms.RadioButton rbShadingPhong;
         private System.Windows.Forms.RadioButton rbShadingGouraud;
         private System.Windows.Forms.RadioButton rbShadingFlat;
         private System.Windows.Forms.GroupBox gbCamera;
-        private System.Windows.Forms.RadioButton radioButton3;
-        private System.Windows.Forms.RadioButton radioButton2;
-        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.RadioButton rbMovingCamera;
+        private System.Windows.Forms.RadioButton rbFocusedCamera;
+        private System.Windows.Forms.RadioButton rbStaticFrontCamera;
         private System.Windows.Forms.GroupBox gbShading;
+        private System.Windows.Forms.GroupBox gbLights;
         private System.Windows.Forms.GroupBox gbFov;
         private System.Windows.Forms.NumericUpDown numericUpDown;
+        private System.Windows.Forms.CheckBox cbDirectional;
+        private System.Windows.Forms.CheckBox cbReflector;
+        private System.Windows.Forms.CheckBox cbPointLight;
+        private System.Windows.Forms.RadioButton rbStaticBackCamera;
     }
 }
 

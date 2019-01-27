@@ -17,10 +17,13 @@ namespace Drawing3D
 
             foreach (LightSource l in lightSources)
             {
-                (float lr, float lg, float lb) = l.PhongIlumination(ks, kd, ka, target, normal, cameraPosition, m);
-                r += lr;
-                g += lg;
-                b += lb;
+                if(l.IsOn)
+                {
+                    (float lr, float lg, float lb) = l.PhongIlumination(ks, kd, ka, target, normal, cameraPosition, m);
+                    r += lr;
+                    g += lg;
+                    b += lb;
+                }
             }
 
             int R = (int)(r * 255);
@@ -37,6 +40,23 @@ namespace Drawing3D
 
 
             return Color.FromArgb(R, G, B);
+        }
+
+        public static Point3D CalculateColor2(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, List<LightSource> lightSources, Point3D backgroundLight, int m)
+        {
+            float r = backgroundLight.X * ka.X;
+            float g = backgroundLight.Y * ka.Y;
+            float b = backgroundLight.Z * ka.Z;
+
+            foreach (LightSource l in lightSources)
+            {
+                (float lr, float lg, float lb) = l.PhongIlumination(ks, kd, ka, target, normal, cameraPosition, m);
+                r += lr;
+                g += lg;
+                b += lb;
+            }
+
+            return new Point3D(r, g, b);
         }
     }
 }

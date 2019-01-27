@@ -22,6 +22,10 @@ namespace Drawing3D
         {
             Position = p;
             NormalVector = n;
+            ScenePosition = new Point3D(0,0,0);
+            N = new Point3D(0, 0, 0);
+            PBis = new Point3D(0, 0, 0);
+            ProjectedPosition = new Point3D(0, 0, 0);
         }
 
         public void CalculateCoordinates(Matrix4x4 model,Matrix4x4 view, Matrix4x4 projection, int w, int h)
@@ -33,5 +37,7 @@ namespace Drawing3D
             ProjectedPosition.X = (ProjectedPosition.X + 1) * (w - 1) / 2;
             ProjectedPosition.Y = (ProjectedPosition.Y + 1) * (h - 1) / 2;
         }
+        public override string ToString() => $"(x:{Position.X},y:{Position.Y},z:{Position.Z})";
+        public Vertice Clone() => new Vertice(Position.Clone(), NormalVector.Clone());
     }
 }

@@ -9,10 +9,11 @@ namespace Drawing3D
 {
     public abstract class LightSource
     {
+        public bool IsOn { get; set; }
         public (float R, float G, float B) Color { get; set; }
         public abstract (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1);
 
-        public LightSource() { Color = (1, 1, 1); }
+        public LightSource() { Color = (1, 1, 1); IsOn = true; }
     }
 
     public class DirectionalLightSource : LightSource
@@ -26,6 +27,7 @@ namespace Drawing3D
         public DirectionalLightSource(Point3D direction, Color color)
         {
             Direction = direction;
+            IsOn = true;
             Color = (color.R / 255, color.G / 255, color.B / 255);
         }
 
@@ -39,8 +41,36 @@ namespace Drawing3D
 
             float r, g, b;
 
-            var tmp1 = Point3D.DotProduct(normal, li);
-            var tmp2 = Math.Max(Point3D.DotProduct(v, ri), 0);
+            float k = Math.Max(Point3D.DotProduct(normal, li), 0);
+            float p = (float)Math.Pow(Math.Max(Point3D.DotProduct(v, ri), 0), m);
+
+            r = Color.R * (kd.X * k + ks.X * p);
+            g = Color.G * (kd.Y * k + ks.Y * p);
+            b = Color.B * (kd.Z * k + ks.Z * p);
+
+            return (r, g, b);
+        }
+    }
+
+    public class PointLightSource : LightSource
+    {
+        public Point3D Position { get; set; }
+
+        public PointLightSource(Point3D position, Color color)
+        {
+            Position = position;
+            IsOn = true;
+            this.Color = (color.R / 255, color.G / 255, color.B / 255);
+        }
+        public override (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1)
+        {
+            Point3D positionToTargetVectior = Position - target;
+            Point3D cameraToTargetVector = cameraPosition - target;
+            Point3D li = positionToTargetVectior / positionToTargetVectior.DistanceFromOrigin();
+            Point3D v = cameraToTargetVector / cameraToTargetVector.DistanceFromOrigin();
+            Point3D ri = normal * (2 * Point3D.DotProduct(normal, li)) - li;
+
+            float r, g, b;
 
             float k = Math.Max(Point3D.DotProduct(normal, li), 0);
             float p = (float)Math.Pow(Math.Max(Point3D.DotProduct(v, ri), 0), m);
@@ -57,14 +87,15 @@ namespace Drawing3D
     {
         public Point3D Position;
         public Point3D Direction;
-        public float Focus;
+        //public float Focus;
 
-        public SpotLightSource(Point3D position, Point3D direction, Color color, float focus)
+        public SpotLightSource(Point3D position, Point3D direction, Color color)
         {
             Position = position;
             Direction = direction;
+            IsOn = true;
             this.Color = (color.R / 255, color.G / 255, color.B / 255);
-            this.Focus = focus;
+            //this.Focus = focus;
         }
 
         public override (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1)
@@ -87,6 +118,7 @@ namespace Drawing3D
             r = Ii.X * (kd.X * k + ks.X * p);
             g = Ii.Y * (kd.Y * k + ks.Y * p);
             b = Ii.Z * (kd.Z * k + ks.Z * p);
+
             return (r, g, b);
         }
     }

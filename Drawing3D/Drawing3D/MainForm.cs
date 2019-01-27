@@ -14,13 +14,20 @@ namespace Drawing3D
 {
     public partial class MainForm : Form
     {
-        //public DirectBitmap Picture { get; set; }
         public Device RenderDevice { get; set; }
-        public Camera StaticCamera { get; set; }
+        public Camera StaticFrontCamera { get; set; }
+        public Camera StaticBackCamera { get; set; }
         public Camera FocusedCamera { get; set; }
         public Camera MovingCamera { get; set; }
-        private System.Timers.Timer rotateModelTimer;
+        public DirectionalLightSource DirectionalLight { get; set; }
+        public SpotLightSource Reflector { get; set; }
+        public PointLightSource PointLight { get; set; }
+        private System.Timers.Timer animationTimer;
 
+        private const float BALL_START_Z = -30f;
+        private const float BALL_V = 1.4f;
+        private const float MOVING_CAM_DIST_Z = 20f;
+        private const float MOVING_CAM_DIST_Y = 20f;
         private int temp = 0;
 
         public MainForm()
@@ -32,76 +39,136 @@ namespace Drawing3D
             float fov = (float)(((int)numericUpDown.Value) * Math.PI / 180);
             float a = (float)pictureBox.Height / pictureBox.Width;
 
-            StaticCamera = new Camera(new Point3D(0, 0, -10f), new Point3D(0, 0, 0), new Point3D(0, 1, 0), fov, a);
 
-            RenderDevice.Camera = StaticCamera;
+            Mesh[] bowlingPinMesh = LoadJSONFile("bowlingpin2.babylon", Color.Wheat, out Point3D pinSize);
+            Mesh[] ballMesh = LoadJSONFile("ball.babylon", Color.Red, out Point3D ballSize);
+            Model ball = new Model(ballMesh[0]);
+            Model floor = CreateRectangle(new Point3D(0, 0, -15), 10f, 45f, Color.Yellow);
+            Model bowlingPin = new Model(bowlingPinMesh[0]);
+            bowlingPin.Position = new Point3D(0, 10, 5);
+            ball.Position = new Point3D(0, ballSize.Y / 2.0f, BALL_START_Z);
+            RenderDevice.Models.AddRange(CreateBowlingTetractys(bowlingPinMesh[0], new Point3D(0, 0, 5), 2.5f));
+            RenderDevice.Models.Add(floor);
+            RenderDevice.Models.Add(ball);
+            RenderDevice.Models.Add(bowlingPin);
 
-            Mesh[] mesh = LoadJSONFile("kregiel2.babylon", Color.Wheat);
-            Model monkey = new Model(mesh[0]);
-            monkey.Mesh.Position = new Point3D(0, -1.5f, 0);
-            RenderDevice.Models.Add(monkey);
+            StaticFrontCamera = new Camera(new Point3D(0, 10.0f, -60f), new Point3D(0, 0, 0), new Point3D(0, 1, 0), fov, a);
+            StaticBackCamera = new Camera(new Point3D(0, 20, 40), new Point3D(0, 0, 0), new Point3D(0, 1, 0), fov, a);
+            FocusedCamera = new Camera(new Point3D(0, 10.0f, BALL_START_Z - 5f), ball.Position, new Point3D(0, 1, 0), fov, a);
+            MovingCamera = new Camera(new Point3D(0, ball.Position.Y + MOVING_CAM_DIST_Y, ball.Position.Z - MOVING_CAM_DIST_Z), ball.Position, new Point3D(0, 1, 0), fov, a);
 
-            rotateModelTimer = new System.Timers.Timer();
-            rotateModelTimer.Interval = 100;
-            rotateModelTimer.Elapsed += (s, e) =>
+            DirectionalLight = new DirectionalLightSource(new Point3D(0, -1, 1)) { IsOn = true };
+            Reflector = new SpotLightSource(new Point3D(0, 25, -15), new Point3D(0, 0, 15), Color.White) { IsOn = false };
+            PointLight = new PointLightSource(new Point3D(5.0f, 15.0f, -5.0f), Color.White) { IsOn = false };
+
+            RenderDevice.Camera = StaticFrontCamera;
+            RenderDevice.Lights.Add(DirectionalLight);
+            RenderDevice.Lights.Add(Reflector);
+            RenderDevice.Lights.Add(PointLight);
+
+            animationTimer = new System.Timers.Timer();
+            animationTimer.Interval = 80;
+            animationTimer.Elapsed += (s, e) =>
             {
-                //Figure.Mesh.Position.X += 0.02f;
-                //Figure.Mesh.Position.Y += 0.02f;
-
-                //Figure.Mesh.Rotation.Y += 0.02f;
-                switch (temp)
+                if (temp < 10)
                 {
-                    //case 0:
-                    //    {
-                    //        Figure.Mesh.Rotation.X += 0.02f;
-                    //        if (Figure.Mesh.Rotation.X >= 1.5f)
-                    //            temp++;
-                    //        break;
-                    //    }
-                    //case 1:
-                    //    {
-                    //        Figure.Mesh.Rotation.Y += 0.02f;
-                    //        if (Figure.Mesh.Rotation.Y >= 1.5f)
-                    //            temp=0;
-                    //        break;
-                    //    }
-                    case 0:
-                        {
-                            StaticCamera.Position.Y += 0.5f;
-                            if (StaticCamera.Position.Z >= 25f)
-                                temp++;
-                            break;
-                        }
-                    case 1:
-                        {
-                            StaticCamera.Position.Y -= 0.3f;
-                            if (StaticCamera.Position.Y <= -5f)
-                                temp = 0;
-                            break;
-                        }
+                    temp++;
                 }
-
+                else if (temp == 11)
+                {
+                    ball.Position.Z += BALL_V;
+                    ball.Mesh.Rotation.X += 0.2f;
+                    MovingCamera.Position.Z += BALL_V;
+                    if (ball.Position.Z >= -2.0f)
+                        temp++;
+                }
+                else if (temp < 26)
+                {
+                    temp++;
+                }
+                else
+                {
+                    ball.Position.Z = BALL_START_Z;
+                    MovingCamera.Position.Z = ball.Position.Z - MOVING_CAM_DIST_Z;
+                    temp = 0;
+                }
+                bowlingPin.Rotation.Z += 0.2f;
+                if (bowlingPin.Rotation.Z > 2 * Math.PI)
+                    bowlingPin.Rotation.Z -= (float)(2 * Math.PI);
                 RenderDevice.UpdateBitmap();
             };
-            //rotateModelTimer.Start();
+            animationTimer.Start();
+
             pictureBox.Image = RenderDevice.Bitmap;
-
-            RenderDevice.UpdateBitmap();
         }
 
-        private void Form1_SizeChanged(object sender, EventArgs e)
+        private Model CreateRectangle(Point3D center, float a, float b, Color color)
         {
-            // TODO
+            float a2 = a / 2, b2 = b / 2;
+            Mesh mesh = new Mesh("Rectangle", 4, 2);
+
+            mesh.Vertices[0] = new Vertice(new Point3D(-a2, 0, -b2), new Point3D(0, 1, 0));
+            mesh.Vertices[1] = new Vertice(new Point3D(-a2, 0, b2), new Point3D(0, 1, 0));
+            mesh.Vertices[2] = new Vertice(new Point3D(a2, 0, b2), new Point3D(0, 1, 0));
+            mesh.Vertices[3] = new Vertice(new Point3D(a2, 0, -b2), new Point3D(0, 1, 0));
+
+            mesh.Faces[0] = new Face() { A = 0, B = 1, C = 2, Color = color };
+            mesh.Faces[1] = new Face() { A = 0, B = 2, C = 3, Color = color };
+
+            //int n = 4, m = 6;
+            //Mesh mesh = new Mesh("Rectangle", (n + 1) * (m + 1), n * m * 2);
+            //float da = a / n, db = b / m;
+            //float sa = -a2, sb = -b2;
+
+            //int fi = 0, k;
+            //for (int i = 0; i <= n; i++)
+            //{
+            //    for (int j = 0; j <= m; j++)
+            //    {
+            //        k = i * (m + 1) + j;
+            //        mesh.Vertices[k] = new Vertice(new Point3D(sa + da * i, 0, sb + db * j), new Point3D(0, 1, 0));
+            //        if (i < n && j < m)
+            //        {
+            //            mesh.Faces[fi] = new Face() { A = k, B = k + 1, C = k + m + 2, Color = color };
+            //            mesh.Faces[fi + 1] = new Face() { A = k, B = k + m + 1, C = k + m + 2, Color = color };
+            //            fi += 2;
+            //        }
+            //    }
+            //}
+
+            Model model = new Model(mesh);
+            model.Position = center;
+            return model;
+        }
+        private List<Model> CreateBowlingTetractys(Mesh pinMesh, Point3D center, float dist)
+        {
+            List<Model> pins = new List<Model>();
+
+            Model pin;
+
+            float dx = dist / 2.0f;
+            float dz = (float)(dist * Math.Sqrt(3) / 2);
+            for (int i = -2; i < 2; i++)
+            {
+                int k = i + 3;
+                float sx = center.X - (k - 1) * dx;
+                for (int j = 0; j < k; j++)
+                {
+                    pin = new Model(pinMesh.Clone());
+                    pin.Mesh.Position = new Point3D(sx + j * dist, center.Y, center.Z + i * dz);
+                    pins.Add(pin);
+                }
+            }
+
+            return pins;
         }
 
-        private void numericUpDown_ValueChanged(object sender, EventArgs e)
+        private Mesh[] LoadJSONFile(string path, Color color, out Point3D size)
         {
-            RenderDevice.Camera.ChangeFov((float)(((int)(sender as NumericUpDown).Value) * Math.PI / 180));
-            RenderDevice.UpdateBitmap();
-        }
+            float minX, minY, minZ, maxX, maxY, maxZ;
+            minX = minY = minZ = float.MaxValue;
+            maxX = maxY = maxZ = float.MinValue;
 
-        private Mesh[] LoadJSONFile(string path, Color color)
-        {
             var meshes = new List<Mesh>();
             Random rand = new Random();
             var data = File.ReadAllText(path, Encoding.UTF8);
@@ -109,6 +176,7 @@ namespace Drawing3D
 
             for (var meshIndex = 0; meshIndex < jsonObject.meshes.Count; meshIndex++)
             {
+                // Vertices with normal vectors
                 var verticesArray = jsonObject.meshes[meshIndex].vertices;
                 // Faces
                 var indicesArray = jsonObject.meshes[meshIndex].indices;
@@ -131,18 +199,25 @@ namespace Drawing3D
                         break;
                 }
 
-                // the number of interesting vertices information for us
+                // The actual number of vertices
                 var verticesCount = verticesArray.Count / verticesStep;
-                // number of faces is logically the size of the array divided by 3 (A, B, C)
                 var facesCount = indicesArray.Count / 3;
                 var mesh = new Mesh(jsonObject.meshes[meshIndex].name.Value, verticesCount, facesCount);
 
-                // Filling the Vertices array of our mesh first
+                // Filling the vertices array
                 for (var index = 0; index < verticesCount; index++)
                 {
                     var x = (float)verticesArray[index * verticesStep].Value;
                     var y = (float)verticesArray[index * verticesStep + 1].Value;
                     var z = (float)verticesArray[index * verticesStep + 2].Value;
+
+                    if (x < minX) minX = x;
+                    if (y < minY) minY = y;
+                    if (z < minZ) minZ = z;
+
+                    if (x > maxX) maxX = x;
+                    if (y > maxY) maxY = y;
+                    if (z > maxZ) maxZ = z;
 
                     var nx = (float)verticesArray[index * verticesStep + 3].Value;
                     var ny = (float)verticesArray[index * verticesStep + 4].Value;
@@ -154,22 +229,20 @@ namespace Drawing3D
                     };
                 }
 
-                // Then filling the Faces array
+                // Faces
                 for (var index = 0; index < facesCount; index++)
                 {
                     var a = (int)indicesArray[index * 3].Value;
                     var b = (int)indicesArray[index * 3 + 1].Value;
                     var c = (int)indicesArray[index * 3 + 2].Value;
-                    //mesh.Faces[index] = new Face { A = a, B = b, C = c, Color = Color.FromArgb(rand.Next() % 256, rand.Next() % 256, rand.Next() % 256) };
                     mesh.Faces[index] = new Face { A = a, B = b, C = c, Color = color };
                 }
 
-                // Getting the position you've set in Blender
                 var position = jsonObject.meshes[meshIndex].position;
                 mesh.Position = new Point3D((float)position[0].Value, (float)position[1].Value, (float)position[2].Value);
                 meshes.Add(mesh);
             }
-
+            size = new Point3D(maxX - minX, maxY - minY, maxZ - minZ);
             return meshes.ToArray();
         }
 
@@ -181,7 +254,6 @@ namespace Drawing3D
                 RenderDevice.UpdateBitmap();
             }
         }
-
         private void rbShadingGouraud_CheckedChanged(object sender, EventArgs e)
         {
             if ((sender as RadioButton).Checked)
@@ -190,7 +262,6 @@ namespace Drawing3D
                 RenderDevice.UpdateBitmap();
             }
         }
-
         private void rbShadingPhong_CheckedChanged(object sender, EventArgs e)
         {
             if ((sender as RadioButton).Checked)
@@ -198,6 +269,55 @@ namespace Drawing3D
                 RenderDevice.Shading = Shading.Phong;
                 RenderDevice.UpdateBitmap();
             }
+        }
+        private void rbStaticFrontCamera_CheckedChanged(object sender, EventArgs e)
+        {
+            if ((sender as RadioButton).Checked)
+            {
+                RenderDevice.Camera = StaticFrontCamera;
+                RenderDevice.UpdateBitmap();
+            }
+        }
+        private void rbStaticBackCamera_CheckedChanged(object sender, EventArgs e)
+        {
+            if ((sender as RadioButton).Checked)
+            {
+                RenderDevice.Camera = StaticBackCamera;
+                RenderDevice.UpdateBitmap();
+            }
+        }
+        private void rbFocusedCamera_CheckedChanged(object sender, EventArgs e)
+        {
+            if ((sender as RadioButton).Checked)
+            {
+                RenderDevice.Camera = FocusedCamera;
+                RenderDevice.UpdateBitmap();
+            }
+        }
+        private void rbMovingCamera_CheckedChanged(object sender, EventArgs e)
+        {
+            if ((sender as RadioButton).Checked)
+            {
+                RenderDevice.Camera = MovingCamera;
+                RenderDevice.UpdateBitmap();
+            }
+        }
+        private void cbDirectional_CheckedChanged(object sender, EventArgs e)
+        {
+            DirectionalLight.IsOn = (sender as CheckBox).Checked;
+        }
+        private void cbReflector_CheckedChanged(object sender, EventArgs e)
+        {
+            Reflector.IsOn = (sender as CheckBox).Checked;
+        }
+        private void cbPointLight_CheckedChanged(object sender, EventArgs e)
+        {
+            PointLight.IsOn = (sender as CheckBox).Checked;
+        }
+        private void numericUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            RenderDevice.Camera.ChangeFov((float)(((int)(sender as NumericUpDown).Value) * Math.PI / 180));
+            RenderDevice.UpdateBitmap();
         }
     }
     class Edge : IComparable

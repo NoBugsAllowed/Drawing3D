@@ -23,6 +23,7 @@ namespace Drawing3D
         }
         public float DistanceFromOrigin() => (float)Math.Sqrt(X * X + Y * Y + Z * Z);
         public override string ToString() => $"({X},{Y},{Z},{W})";
+        public Point3D Clone() => new Point3D(X, Y, Z, W);
 
         public static Point3D operator *(Matrix4x4 matrix, Point3D point)
         {

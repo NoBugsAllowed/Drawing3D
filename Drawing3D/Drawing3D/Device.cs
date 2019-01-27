@@ -18,6 +18,7 @@ namespace Drawing3D
         private int renderWidth;
         private int renderHeight;
         private PictureBox pictureBox;
+        private bool isRendering = false;
 
         public Shading Shading { get; set; }
         public List<Model> Models { get; set; }
@@ -40,7 +41,7 @@ namespace Drawing3D
             //Lights = new LightSource[1];
             //Lights[0] = new DirectionalLightSource(new Point3D(0, 0, 1));
 
-            Lights.Add(new DirectionalLightSource(new Point3D(0, 0, 1)));
+            //Lights.Add(new DirectionalLightSource(new Point3D(0, 0, 1)));
 
             Shading = Shading.Flat;
             //Lights.Add(new SpotLightSource(new Point3D(0, -20f, -50f), new Point3D(0, 0, 1.4f), Color.White, 10f));
@@ -76,6 +77,9 @@ namespace Drawing3D
 
         public void UpdateBitmap()
         {
+            if (isRendering)
+                return;
+
             Clear();
             Render(Camera, Models);
             Present();
@@ -83,79 +87,48 @@ namespace Drawing3D
 
         public void Render(Camera camera, List<Model> modelList)
         {
-            //Matrix4x4 projection = MatrixTransform.Prespective(0.8f, (float)renderHeight / renderWidth, 0.01f, 1.0f);
-            //Matrix4x4 view = MatrixTransform.LookAt(camera);
+            if (isRendering)
+                return;
 
-            foreach(Model model in modelList)
+            isRendering = true;
+            Matrix4x4 projection = MatrixTransform.Projection(camera.Fov, (float)renderHeight / renderWidth, camera.N, camera.F);
+            Matrix4x4 view = MatrixTransform.View(Camera);
+            foreach (Model model in modelList)
             {
                 Matrix4x4 matrix = MatrixTransform.Translation(model.Mesh.Position) * MatrixTransform.RotationX(model.Mesh.Rotation.X) * MatrixTransform.RotationY(model.Mesh.Rotation.Y) * MatrixTransform.RotationZ(model.Mesh.Rotation.Z);
 
-                foreach (Face face in model.Mesh.Faces)
+                Parallel.ForEach(model.Mesh.Faces, face =>
                 {
-                    Vertice v1 = model.Mesh.Vertices[face.A];
-                    Vertice v2 = model.Mesh.Vertices[face.B];
-                    Vertice v3 = model.Mesh.Vertices[face.C];
+                    Vertice v1 = model.Mesh.Vertices[face.A].Clone();
+                    Vertice v2 = model.Mesh.Vertices[face.B].Clone();
+                    Vertice v3 = model.Mesh.Vertices[face.C].Clone();
 
-                    v1.CalculateCoordinates(matrix, Camera.ViewMatrix, Camera.ProjectionMatrix, renderWidth, renderHeight);
-                    v2.CalculateCoordinates(matrix, Camera.ViewMatrix, Camera.ProjectionMatrix, renderWidth, renderHeight);
-                    v3.CalculateCoordinates(matrix, Camera.ViewMatrix, Camera.ProjectionMatrix, renderWidth, renderHeight);
-                    //v1.CalculateCoordinates(matrix, view, projection, renderWidth, renderHeight);
-                    //v2.CalculateCoordinates(matrix, view, projection, renderWidth, renderHeight);
-                    //v3.CalculateCoordinates(matrix, view, projection, renderWidth, renderHeight);
+                    //v1.CalculateCoordinates(matrix, Camera.ViewMatrix, Camera.ProjectionMatrix, renderWidth, renderHeight);
+                    //v2.CalculateCoordinates(matrix, Camera.ViewMatrix, Camera.ProjectionMatrix, renderWidth, renderHeight);
+                    //v3.CalculateCoordinates(matrix, Camera.ViewMatrix, Camera.ProjectionMatrix, renderWidth, renderHeight);
+                    v1.CalculateCoordinates(matrix, view, projection, renderWidth, renderHeight);
+                    v2.CalculateCoordinates(matrix, view, projection, renderWidth, renderHeight);
+                    v3.CalculateCoordinates(matrix, view, projection, renderWidth, renderHeight);
 
                     FillTriangle(v1, v2, v3, face.Color, Shading);
-                }
+                });
+                //foreach(Face face in model.Mesh.Faces)
+                //{
+                //    Vertice v1 = model.Mesh.Vertices[face.A].Clone();
+                //    Vertice v2 = model.Mesh.Vertices[face.B].Clone();
+                //    Vertice v3 = model.Mesh.Vertices[face.C].Clone();
+
+                //    //v1.CalculateCoordinates(matrix, Camera.ViewMatrix, Camera.ProjectionMatrix, renderWidth, renderHeight);
+                //    //v2.CalculateCoordinates(matrix, Camera.ViewMatrix, Camera.ProjectionMatrix, renderWidth, renderHeight);
+                //    //v3.CalculateCoordinates(matrix, Camera.ViewMatrix, Camera.ProjectionMatrix, renderWidth, renderHeight);
+                //    v1.CalculateCoordinates(matrix, view, projection, renderWidth, renderHeight);
+                //    v2.CalculateCoordinates(matrix, view, projection, renderWidth, renderHeight);
+                //    v3.CalculateCoordinates(matrix, view, projection, renderWidth, renderHeight);
+
+                //    FillTriangle(v1, v2, v3, face.Color, Shading);
+                //}
             }
-            
-            //Parallel.ForEach(model.Mesh.Faces, face =>
-            //{
-            //    Vertice v1 = model.Mesh.Vertices[face.A];
-            //    Vertice v2 = model.Mesh.Vertices[face.B];
-            //    Vertice v3 = model.Mesh.Vertices[face.C];
-
-            //    v1.CalculateCoordinates(matrix, view, projection);
-            //    v2.CalculateCoordinates(matrix, view, projection);
-            //    v3.CalculateCoordinates(matrix, view, projection);
-
-            //    Point3D p1 = v1.ProjectedPosition;
-            //    Point3D p2 = v2.ProjectedPosition;
-            //    Point3D p3 = v3.ProjectedPosition;
-
-            //    p1.X = (int)(((p1.X / p1.W) + 1) * renderWidth / 2);
-            //    p1.Y = (int)(((p1.Y / p1.W) + 1) * renderHeight / 2);
-
-            //    p2.X = (int)(((p2.X / p2.W) + 1) * renderWidth / 2);
-            //    p2.Y = (int)(((p2.Y / p2.W) + 1) * renderHeight / 2);
-
-            //    p3.X = (int)(((p3.X / p3.W) + 1) * renderWidth / 2);
-            //    p3.Y = (int)(((p3.Y / p3.W) + 1) * renderHeight / 2);
-
-            //    FillTriangle(p1, p2, p3, face.Color);
-
-            //    //Point3D p1 = matrix * model.Mesh.Vertices[face.A].Position;
-            //    //Point3D p2 = matrix * model.Mesh.Vertices[face.B].Position;
-            //    //Point3D p3 = matrix * model.Mesh.Vertices[face.C].Position;
-
-            //    //p1.X = (int)(((p1.X / p1.W) + 1) * renderWidth / 2);
-            //    //p1.Y = (int)(((p1.Y / p1.W) + 1) * renderHeight / 2);
-
-            //    //p2.X = (int)(((p2.X / p2.W) + 1) * renderWidth / 2);
-            //    //p2.Y = (int)(((p2.Y / p2.W) + 1) * renderHeight / 2);
-
-            //    //p3.X = (int)(((p3.X / p3.W) + 1) * renderWidth / 2);
-            //    //p3.Y = (int)(((p3.Y / p3.W) + 1) * renderHeight / 2);
-
-            //    //p1.X = (int)(((p1.X / p1.W) + 1) * renderWidth / 2);
-            //    //p1.Y = (int)(((p1.Y / p1.W) + 1) * renderHeight / 2);
-
-            //    //p2.X = (int)(((p2.X / p2.W) + 1) * renderWidth / 2);
-            //    //p2.Y = (int)(((p2.Y / p2.W) + 1) * renderHeight / 2);
-
-            //    //p3.X = (int)(((p3.X / p3.W) + 1) * renderWidth / 2);
-            //    //p3.Y = (int)(((p3.Y / p3.W) + 1) * renderHeight / 2);
-
-            //    //FillTriangle(p1, p2, p3, face.Color);
-            //});
+            isRendering = false;
         }
 
         float Clamp(float value, float min = 0, float max = 1)
@@ -311,6 +284,7 @@ namespace Drawing3D
             m2 = (up.X - down.X) / (up.Y - down.Y);
 
             Color colDown, colMid, colUp;
+            Point3D colDown2, colMid2, colUp2;
 
             Point3D ks = new Point3D((float)col.R / 255, (float)col.G / 255, (float)col.B / 255);
             Point3D kd = new Point3D((float)col.R / 255, (float)col.G / 255, (float)col.B / 255);
@@ -362,9 +336,13 @@ namespace Drawing3D
             }
             else if (shading == Shading.Gouraud)
             {
-                colDown = PhongLightingModel.CalculateColor(ks, kd, ka, down, v1.N, Camera.Position, Lights, new Point3D(0, 0, 0), 1);
-                colMid = PhongLightingModel.CalculateColor(ks, kd, ka, mid, v2.N, Camera.Position, Lights, new Point3D(0, 0, 0), 1);
-                colUp = PhongLightingModel.CalculateColor(ks, kd, ka, up, v3.N, Camera.Position, Lights, new Point3D(0, 0, 0), 1);
+                colDown = PhongLightingModel.CalculateColor(ks, kd, ka, v1.Position, v1.N, Camera.Position, Lights, new Point3D(0, 0, 0), 1);
+                colMid = PhongLightingModel.CalculateColor(ks, kd, ka, v2.Position, v2.N, Camera.Position, Lights, new Point3D(0, 0, 0), 1);
+                colUp = PhongLightingModel.CalculateColor(ks, kd, ka, v3.Position, v3.N, Camera.Position, Lights, new Point3D(0, 0, 0), 1);
+
+                //colDown2 = PhongLightingModel.CalculateColor2(ks, kd, ka, v1.ScenePosition, v1.N, Camera.Position, Lights, new Point3D(0, 0, 0), 1);
+                //colMid2 = PhongLightingModel.CalculateColor2(ks, kd, ka, v2.ScenePosition, v2.N, Camera.Position, Lights, new Point3D(0, 0, 0), 1);
+                //colUp2 = PhongLightingModel.CalculateColor2(ks, kd, ka, v3.ScenePosition, v3.N, Camera.Position, Lights, new Point3D(0, 0, 0), 1);
 
                 if (m1 > m2)
                 {
@@ -373,10 +351,12 @@ namespace Drawing3D
                         if (y < mid.Y)
                         {
                             ProcessScanLineGouraud(y, down, up, down, mid, colDown, colUp, colDown, colMid);
+                            //ProcessScanLineGouraud(y, down, up, down, mid, colDown2, colUp2, colDown2, colMid2);
                         }
                         else
                         {
                             ProcessScanLineGouraud(y, down, up, mid, up, colDown, colUp, colMid, colUp);
+                            //ProcessScanLineGouraud(y, down, up, mid, up, colDown2, colUp2, colMid2, colUp2);
                         }
                     }
                 }
@@ -385,6 +365,7 @@ namespace Drawing3D
                     for (var y = Math.Max(0, (int)down.Y); y <= yMax; y++)
                     {
                         ProcessScanLineGouraud(y, down, up, mid, up, colDown, colUp, colMid, colUp);
+                        //ProcessScanLineGouraud(y, down, up, mid, up, colDown2, colUp2, colMid2, colUp2);
                     }
                 }
                 else
@@ -394,10 +375,12 @@ namespace Drawing3D
                         if (y < mid.Y)
                         {
                             ProcessScanLineGouraud(y, down, mid, down, up, colDown, colMid, colDown, colUp);
+                            //ProcessScanLineGouraud(y, down, mid, down, up, colDown2, colMid2, colDown2, colUp2);
                         }
                         else
                         {
                             ProcessScanLineGouraud(y, mid, up, down, up, colMid, colUp, colDown, colUp);
+                            //ProcessScanLineGouraud(y, mid, up, down, up, colMid2, colUp2, colDown2, colUp2);
                         }
                     }
                 }
@@ -463,6 +446,50 @@ namespace Drawing3D
             }
         }
 
+        //public void ProcessScanLineGouraud(int y, Point3D pa, Point3D pb, Point3D pc, Point3D pd, Point3D ca, Point3D cb, Point3D cc, Point3D cd)
+        //{
+        //    var gradient1 = pa.Y != pb.Y ? (y - pa.Y) / (pb.Y - pa.Y) : 1;
+        //    var gradient2 = pc.Y != pd.Y ? (y - pc.Y) / (pd.Y - pc.Y) : 1;
+
+        //    int sx = (int)Interpolate(pa.X, pb.X, gradient1);
+        //    int ex = (int)Interpolate(pc.X, pd.X, gradient2);
+
+        //    float z1 = Interpolate(pa.Z, pb.Z, gradient1);
+        //    float z2 = Interpolate(pc.Z, pd.Z, gradient2);
+
+        //    float r1 = Interpolate(ca.X, cb.X, gradient1);
+        //    float g1 = Interpolate(ca.Y, cb.Y, gradient1);
+        //    float b1 = Interpolate(ca.Z, cb.Z, gradient1);
+
+        //    float r2 = Interpolate(cc.X, cd.X, gradient2);
+        //    float g2 = Interpolate(cc.Y, cd.Y, gradient2);
+        //    float b2 = Interpolate(cc.Z, cd.Z, gradient2);
+
+        //    int xMax = Math.Min(renderWidth - 1, ex);
+        //    for (int x = Math.Max(0, sx); x < xMax; x++)
+        //    {
+        //        float gradient = (x - sx) / (float)(ex - sx);
+
+        //        float z = Interpolate(z1, z2, gradient);
+        //        float r = Interpolate(r1, r2, gradient);
+        //        float g = Interpolate(r1, r2, gradient);
+        //        float b = Interpolate(r1, r2, gradient);
+
+        //        int R = (int)(r * 255);
+        //        int G = (int)(g * 255);
+        //        int B = (int)(b * 255);
+
+        //        if (R > 255) R = 255;
+        //        if (G > 255) G = 255;
+        //        if (B > 255) B = 255;
+
+        //        if (R < 0) R = 0;
+        //        if (G < 0) G = 0;
+        //        if (B < 0) B = 0;
+
+        //        SetPixel(x, y, z, Color.FromArgb(R,G,B));
+        //    }
+        //}
         public void ProcessScanLineGouraud(int y, Point3D pa, Point3D pb, Point3D pc, Point3D pd, Color ca, Color cb, Color cc, Color cd)
         {
             var gradient1 = pa.Y != pb.Y ? (y - pa.Y) / (pb.Y - pa.Y) : 1;
@@ -489,8 +516,8 @@ namespace Drawing3D
 
                 float z = Interpolate(z1, z2, gradient);
                 int r = (int)Interpolate(r1, r2, gradient);
-                int g = (int)Interpolate(r1, r2, gradient);
-                int b = (int)Interpolate(r1, r2, gradient);
+                int g = (int)Interpolate(g1, g2, gradient);
+                int b = (int)Interpolate(b1, b2, gradient);
 
                 SetPixel(x, y, z, Color.FromArgb(r, g, b));
             }

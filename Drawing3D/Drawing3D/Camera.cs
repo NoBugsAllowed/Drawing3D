@@ -9,17 +9,17 @@ namespace Drawing3D
 {
     public class Camera
     {
-        private float n;
-        private float f;
         private float a;
 
         public float Fov { get; set; }
+        public float N { get; set; } //near
+        public float F { get; set; } //far
         public Matrix4x4 ProjectionMatrix;
         public Matrix4x4 ViewMatrix;
 
-        public Point3D Position { get; set; }
-        public Point3D Target { get; set; }
-        public Point3D Up { get; set; }
+        public Point3D Position { get; private set; }
+        public Point3D Target { get; private set; }
+        public Point3D Up { get; private set; }
 
         public Camera(Point3D position, Point3D target, Point3D up, float fov, float a, float n = 0.01f, float f = 1.0f)
         {
@@ -28,19 +28,9 @@ namespace Drawing3D
             Target = target;
             Up = up;
 
-            this.n = n;
-            this.f = f;
+            N = n;
+            F = f;
             this.a = a;
-
-            //ProjectionMatrix = new Matrix4x4(e, 0, 0, 0,
-            //    0, e / a, 0, 0,
-            //    0, 0, -(f + n) / (f - n), -2 * f * n / (f - n),
-            //    0, 0, -1, 0);
-
-            //ViewMatrix = new Matrix4x4(0, 1, 0, -0.5f,
-            //    0, 0, 1, -0.5f,
-            //    1, 0, 0, -3,
-            //    0, 0, 0, 1);
 
             Matrix4x4 m = new Matrix4x4();
             Point3D tmp = (Position - Target);
@@ -89,13 +79,43 @@ namespace Drawing3D
 
         public void ChangeParameters(float a, float n = 0.01f, float f = 1.0f)
         {
-            this.n = n;
-            this.f = f;
+            N = n;
+            F = f;
             this.a = a;
 
             ProjectionMatrix.M22 = ProjectionMatrix.M11 / a;
             ProjectionMatrix.M33 = -(f + n) / (f - n);
             ProjectionMatrix.M34 = -2 * f * n / (f - n);
+        }
+
+        public void SetPosition(Point3D position, Point3D target)
+        {
+            Position = position;
+            Target = target;
+
+            Point3D tmp = (Position - Target);
+            Point3D cZ = tmp / tmp.DistanceFromOrigin();
+            tmp = Point3D.CrossProduct(Up, cZ);
+            Point3D cX = tmp / tmp.DistanceFromOrigin();
+            tmp = Point3D.CrossProduct(cZ, cX);
+            Point3D cY = tmp / tmp.DistanceFromOrigin();
+
+            ViewMatrix.M11 = -cX.X;
+            ViewMatrix.M12 = -cX.Y;
+            ViewMatrix.M13 = -cX.Z;
+            ViewMatrix.M14 = -Point3D.DotProduct(cX, Position);
+            ViewMatrix.M21 = cY.X;
+            ViewMatrix.M22 = cY.Y;
+            ViewMatrix.M23 = cY.Z;
+            ViewMatrix.M24 = -Point3D.DotProduct(cY, Position);
+            ViewMatrix.M31 = cZ.X;
+            ViewMatrix.M32 = cZ.Y;
+            ViewMatrix.M33 = cZ.Z;
+            ViewMatrix.M34 = -Point3D.DotProduct(cZ, Position);
+            ViewMatrix.M41 = 0;
+            ViewMatrix.M42 = 0;
+            ViewMatrix.M43 = 0;
+            ViewMatrix.M44 = 1;
         }
     }
 }
