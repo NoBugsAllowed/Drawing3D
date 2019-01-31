@@ -24,13 +24,13 @@ namespace Drawing3D
         {
             Direction = direction;
         }
+
         public DirectionalLightSource(Point3D direction, Color color)
         {
             Direction = direction;
             IsOn = true;
             Color = (color.R / 255, color.G / 255, color.B / 255);
         }
-
         public override (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1)
         {
             Point3D li = -Direction;
@@ -62,6 +62,7 @@ namespace Drawing3D
             IsOn = true;
             this.Color = (color.R / 255, color.G / 255, color.B / 255);
         }
+
         public override (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1)
         {
             Point3D positionToTargetVectior = Position - target;
@@ -87,7 +88,6 @@ namespace Drawing3D
     {
         public Point3D Position;
         public Point3D Direction;
-        //public float Focus;
 
         public SpotLightSource(Point3D position, Point3D direction, Color color)
         {
@@ -95,7 +95,6 @@ namespace Drawing3D
             Direction = direction;
             IsOn = true;
             this.Color = (color.R / 255, color.G / 255, color.B / 255);
-            //this.Focus = focus;
         }
 
         public override (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1)

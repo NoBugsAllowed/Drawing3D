@@ -39,33 +39,38 @@ namespace Drawing3D
             float fov = (float)(((int)numericUpDown.Value) * Math.PI / 180);
             float a = (float)pictureBox.Height / pictureBox.Width;
 
-
+            //Load models and set positions
             Mesh[] bowlingPinMesh = LoadJSONFile("bowlingpin2.babylon", Color.Wheat, out Point3D pinSize);
             Mesh[] ballMesh = LoadJSONFile("ball.babylon", Color.Red, out Point3D ballSize);
             Model ball = new Model(ballMesh[0]);
             Model floor = CreateRectangle(new Point3D(0, 0, -15), 10f, 45f, Color.Yellow);
             Model bowlingPin = new Model(bowlingPinMesh[0]);
+            List<Model> bowlingPins = CreateBowlingTetractys(bowlingPinMesh[0], new Point3D(0, 0, 5), 2.5f);
             bowlingPin.Position = new Point3D(0, 10, 5);
             ball.Position = new Point3D(0, ballSize.Y / 2.0f, BALL_START_Z);
-            RenderDevice.Models.AddRange(CreateBowlingTetractys(bowlingPinMesh[0], new Point3D(0, 0, 5), 2.5f));
-            RenderDevice.Models.Add(floor);
-            RenderDevice.Models.Add(ball);
-            RenderDevice.Models.Add(bowlingPin);
 
+            //Set cameras positions
             StaticFrontCamera = new Camera(new Point3D(0, 10.0f, -60f), new Point3D(0, 0, 0), new Point3D(0, 1, 0), fov, a);
             StaticBackCamera = new Camera(new Point3D(0, 20, 40), new Point3D(0, 0, 0), new Point3D(0, 1, 0), fov, a);
             FocusedCamera = new Camera(new Point3D(0, 10.0f, BALL_START_Z - 5f), ball.Position, new Point3D(0, 1, 0), fov, a);
             MovingCamera = new Camera(new Point3D(0, ball.Position.Y + MOVING_CAM_DIST_Y, ball.Position.Z - MOVING_CAM_DIST_Z), ball.Position, new Point3D(0, 1, 0), fov, a);
 
+            //Set light sources
             DirectionalLight = new DirectionalLightSource(new Point3D(0, -1, 1)) { IsOn = true };
             Reflector = new SpotLightSource(new Point3D(0, 25, -15), new Point3D(0, 0, 15), Color.White) { IsOn = false };
             PointLight = new PointLightSource(new Point3D(5.0f, 15.0f, -5.0f), Color.White) { IsOn = false };
 
+            //Passing objects to render device 
             RenderDevice.Camera = StaticFrontCamera;
             RenderDevice.Lights.Add(DirectionalLight);
             RenderDevice.Lights.Add(Reflector);
             RenderDevice.Lights.Add(PointLight);
+            RenderDevice.Models.AddRange(bowlingPins);
+            RenderDevice.Models.Add(floor);
+            RenderDevice.Models.Add(ball);
+            RenderDevice.Models.Add(bowlingPin);
 
+            //Set up timer to animate scene
             animationTimer = new System.Timers.Timer();
             animationTimer.Interval = 80;
             animationTimer.Elapsed += (s, e) =>
@@ -163,6 +168,7 @@ namespace Drawing3D
             return pins;
         }
 
+        //Loading mesh from .babylon file
         private Mesh[] LoadJSONFile(string path, Color color, out Point3D size)
         {
             float minX, minY, minZ, maxX, maxY, maxZ;
@@ -246,6 +252,7 @@ namespace Drawing3D
             return meshes.ToArray();
         }
 
+        //Radiobuttons & comboboxes handlers
         private void rbShadingFlat_CheckedChanged(object sender, EventArgs e)
         {
             if ((sender as RadioButton).Checked)
@@ -319,30 +326,5 @@ namespace Drawing3D
             RenderDevice.Camera.ChangeFov((float)(((int)(sender as NumericUpDown).Value) * Math.PI / 180));
             RenderDevice.UpdateBitmap();
         }
-    }
-    class Edge : IComparable
-    {
-        public int YMax { get; set; }
-        public double X { get; set; }
-        public double Ctg { get; set; }
-        public Edge Next { get; set; }
-
-        public static bool operator ==(Edge e1, Edge e2) => e1.YMax == e2.YMax && e1.Ctg == e2.Ctg;
-
-        public static bool operator !=(Edge e1, Edge e2) => !(e1 == e2);
-
-        public static bool operator >=(Edge e1, Edge e2) => e1.X >= e2.X;
-
-        public static bool operator <=(Edge e1, Edge e2) => e1.X <= e2.X;
-
-        public int CompareTo(object obj)
-        {
-            if (X < ((Edge)obj).X) return -1;
-            else if (X == ((Edge)obj).X) return 0;
-            return 1;
-        }
-        public override bool Equals(object obj) => obj is Edge && this == (obj as Edge);
-        public override int GetHashCode() => base.GetHashCode();
-
     }
 }

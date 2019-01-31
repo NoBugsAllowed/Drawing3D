@@ -7,48 +7,11 @@ using System.Threading.Tasks;
 
 namespace Drawing3D
 {
-    class MatrixTransform
+    class Matrices
     {
-        // TODO
-        //public static Matrix4x44x4 Rotate(float x,float y,float z)
-        //{
-        //    Matrix4x44x4 Matrix4x4 = new Matrix4x44x4();
-
-        //    return Matrix4x4;
-        //}
-        public static Matrix4x4 Translation(Point3D t)
-        {
-            Matrix4x4 m = new Matrix4x4();
-            m.M11 = 1;
-            m.M12 = 0;
-            m.M13 = 0;
-            m.M14 = t.X;
-            m.M21 = 0;
-            m.M22 = 1;
-            m.M23 = 0;
-            m.M24 = t.Y;
-            m.M31 = 0;
-            m.M32 = 0;
-            m.M33 = 1;
-            m.M34 = t.Z;
-            m.M41 = 0;
-            m.M42 = 0;
-            m.M43 = 0;
-            m.M44 = 1;
-            return m;
-        }
         public static Matrix4x4 Projection(float fov, float a, float n, float f)
         {
-            //n-bliższa płaszczyzna ograniczająca z-towa składowa
-            //f-dalsza płaszczyzna ograniczająca z-towa składowa
-            //a-stosunek wysokości do szerokości ekranu
-            //fov(field of view) - kąt widzenia
             Matrix4x4 m = new Matrix4x4();
-            //m.M11 = (float)(1.0f / Math.Tan(fov * 0.5f));
-            //m.M22 = (float)-(m.M11 / a);
-            //m.M33 = (float)((-f - n) / (f - n));
-            //m.M34 = (float)((-2 * f * n) / (f - n));
-            //m.M43 = -1;
             m.M11 = (float)(1.0f / Math.Tan(fov * 0.5f));
             m.M22 = -(m.M11 / a);
             m.M33 = (-f - n) / (f - n);
@@ -84,7 +47,27 @@ namespace Drawing3D
             m.M44 = 1;
             return m;
         }
-
+        public static Matrix4x4 Translation(Point3D t)
+        {
+            Matrix4x4 m = new Matrix4x4();
+            m.M11 = 1;
+            m.M12 = 0;
+            m.M13 = 0;
+            m.M14 = t.X;
+            m.M21 = 0;
+            m.M22 = 1;
+            m.M23 = 0;
+            m.M24 = t.Y;
+            m.M31 = 0;
+            m.M32 = 0;
+            m.M33 = 1;
+            m.M34 = t.Z;
+            m.M41 = 0;
+            m.M42 = 0;
+            m.M43 = 0;
+            m.M44 = 1;
+            return m;
+        }
         public static Matrix4x4 RotationX(double alpha)
         {
             Matrix4x4 m = new Matrix4x4();

@@ -9,12 +9,12 @@ namespace Drawing3D
 {
     public class Vertice
     {
-        public Point3D Position { get; set; }
-        public Point3D NormalVector { get; set; }
-        public Point3D ScenePosition { get; private set; }
-        public Point3D N { get; private set; }
-        public Point3D PBis { get; private set; }
-        public Point3D ProjectedPosition { get; private set; }
+        public Point3D Position { get; set; } //Position in local coordinate system
+        public Point3D NormalVector { get; set; } //Normal vector in local coordinate system
+        public Point3D ScenePosition { get; private set; } //Position in global coordinate system
+        public Point3D N { get; private set; } //Normal vector in global coordinate system
+        public Point3D PBis { get; private set; } //Position multiplicated by view and projection matrix (not normalized)
+        public Point3D ProjectedPosition { get; private set; } //PBis normalized
 
         public Vertice() { }
 
