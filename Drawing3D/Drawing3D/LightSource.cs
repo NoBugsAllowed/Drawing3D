@@ -11,7 +11,7 @@ namespace Drawing3D
     {
         public bool IsOn { get; set; }
         public (float R, float G, float B) Color { get; set; }
-        public abstract (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1);
+        public abstract (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1);
 
         public LightSource() { Color = (1, 1, 1); IsOn = true; }
     }
@@ -31,7 +31,7 @@ namespace Drawing3D
             IsOn = true;
             Color = (color.R / 255, color.G / 255, color.B / 255);
         }
-        public override (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1)
+        public override (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1)
         {
             Point3D li = -Direction;
             Point3D cameraToTargetVector = cameraPosition - target;
@@ -63,7 +63,7 @@ namespace Drawing3D
             this.Color = (color.R / 255, color.G / 255, color.B / 255);
         }
 
-        public override (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1)
+        public override (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1)
         {
             Point3D positionToTargetVectior = Position - target;
             Point3D cameraToTargetVector = cameraPosition - target;
@@ -92,12 +92,12 @@ namespace Drawing3D
         public SpotLightSource(Point3D position, Point3D direction, Color color)
         {
             Position = position;
-            Direction = direction;
+            Direction = direction / direction.DistanceFromOrigin();
             IsOn = true;
             this.Color = (color.R / 255, color.G / 255, color.B / 255);
         }
 
-        public override (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D ka, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1)
+        public override (float, float, float) PhongIlumination(Point3D ks, Point3D kd, Point3D target, Point3D normal, Point3D cameraPosition, int m = 1)
         {
             Point3D positionToTargetVectior = Position - target;
             Point3D cameraToTargetVector = cameraPosition - target;
@@ -107,7 +107,6 @@ namespace Drawing3D
 
             float r, g, b;
 
-            var tmp = Point3D.DotProduct(-Direction, li);
             float q = Math.Max(Point3D.DotProduct(-Direction, li), 0);
 
             Point3D Ii = new Point3D(Color.R * q, Color.G * q, Color.B * q);

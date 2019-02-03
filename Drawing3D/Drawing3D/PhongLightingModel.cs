@@ -19,7 +19,7 @@ namespace Drawing3D
             {
                 if(l.IsOn)
                 {
-                    (float lr, float lg, float lb) = l.PhongIlumination(ks, kd, ka, target, normal, cameraPosition, m);
+                    (float lr, float lg, float lb) = l.PhongIlumination(ks, kd, target, normal, cameraPosition, m);
                     r += lr;
                     g += lg;
                     b += lb;

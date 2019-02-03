@@ -88,21 +88,35 @@ namespace Drawing3D
             foreach (Model model in modelList)
             {
                 //Calculate model matrix
-                Matrix4x4 modelMatrix = Matrices.Translation(model.Mesh.Position) * Matrices.RotationX(model.Mesh.Rotation.X) * Matrices.RotationY(model.Mesh.Rotation.Y) * Matrices.RotationZ(model.Mesh.Rotation.Z);
+                Matrix4x4 rotationMatrix = Matrices.RotationX(model.Mesh.Rotation.X) * Matrices.RotationY(model.Mesh.Rotation.Y) * Matrices.RotationZ(model.Mesh.Rotation.Z);
+                Matrix4x4 modelMatrix = Matrices.Translation(model.Mesh.Position) * rotationMatrix;
 
-                Parallel.ForEach(model.Mesh.Faces, face =>
+                //Parallel.ForEach(model.Mesh.Faces, face =>
+                //{
+                //    Vertice v1 = model.Mesh.Vertices[face.A].Clone();
+                //    Vertice v2 = model.Mesh.Vertices[face.B].Clone();
+                //    Vertice v3 = model.Mesh.Vertices[face.C].Clone();
+
+                //    //Calculate position in global coords, position on bitmap and normal vectors for each vertice
+                //    v1.CalculateCoordinates(modelMatrix, view, projection, renderWidth, renderHeight);
+                //    v2.CalculateCoordinates(modelMatrix, view, projection, renderWidth, renderHeight);
+                //    v3.CalculateCoordinates(modelMatrix, view, projection, renderWidth, renderHeight);
+
+                //    FillTriangle(v1, v2, v3, face.Color, Shading);
+                //});
+                foreach(Face face in model.Mesh.Faces)
                 {
                     Vertice v1 = model.Mesh.Vertices[face.A].Clone();
                     Vertice v2 = model.Mesh.Vertices[face.B].Clone();
                     Vertice v3 = model.Mesh.Vertices[face.C].Clone();
 
                     //Calculate position in global coords, position on bitmap and normal vectors for each vertice
-                    v1.CalculateCoordinates(modelMatrix, view, projection, renderWidth, renderHeight);
-                    v2.CalculateCoordinates(modelMatrix, view, projection, renderWidth, renderHeight);
-                    v3.CalculateCoordinates(modelMatrix, view, projection, renderWidth, renderHeight);
+                    v1.CalculateCoordinates(modelMatrix, rotationMatrix, view, projection, renderWidth, renderHeight);
+                    v2.CalculateCoordinates(modelMatrix, rotationMatrix, view, projection, renderWidth, renderHeight);
+                    v3.CalculateCoordinates(modelMatrix, rotationMatrix, view, projection, renderWidth, renderHeight);
 
                     FillTriangle(v1, v2, v3, face.Color, Shading);
-                });
+                }
             }
             isRendering = false;
         }

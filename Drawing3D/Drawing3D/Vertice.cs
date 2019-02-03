@@ -28,10 +28,11 @@ namespace Drawing3D
             ProjectedPosition = new Point3D(0, 0, 0);
         }
 
-        public void CalculateCoordinates(Matrix4x4 model,Matrix4x4 view, Matrix4x4 projection, int w, int h)
+        public void CalculateCoordinates(Matrix4x4 model, Matrix4x4 rotation, Matrix4x4 view, Matrix4x4 projection, int w, int h)
         {
             ScenePosition = model * Position;
-            N = model * NormalVector;
+            N = rotation * NormalVector;
+            N = N / N.DistanceFromOrigin();
             PBis = projection * view * ScenePosition;
             ProjectedPosition = PBis / PBis.W;
             ProjectedPosition.X = (ProjectedPosition.X + 1) * (w - 1) / 2;

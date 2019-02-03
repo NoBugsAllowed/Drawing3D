@@ -40,8 +40,8 @@ namespace Drawing3D
             float a = (float)pictureBox.Height / pictureBox.Width;
 
             //Load models and set positions
-            Mesh[] bowlingPinMesh = LoadJSONFile("bowlingpin2.babylon", Color.Wheat, out Point3D pinSize);
-            Mesh[] ballMesh = LoadJSONFile("ball.babylon", Color.Red, out Point3D ballSize);
+            Mesh[] bowlingPinMesh = LoadJSONFile("../../bowlingpin.babylon", Color.Wheat, out Point3D pinSize);
+            Mesh[] ballMesh = LoadJSONFile("../../ball.babylon", Color.Red, out Point3D ballSize);
             Model ball = new Model(ballMesh[0]);
             Model floor = CreateRectangle(new Point3D(0, 0, -15), 10f, 45f, Color.Yellow);
             Model bowlingPin = new Model(bowlingPinMesh[0]);
@@ -52,12 +52,12 @@ namespace Drawing3D
             //Set cameras positions
             StaticFrontCamera = new Camera(new Point3D(0, 10.0f, -60f), new Point3D(0, 0, 0), new Point3D(0, 1, 0), fov, a);
             StaticBackCamera = new Camera(new Point3D(0, 20, 40), new Point3D(0, 0, 0), new Point3D(0, 1, 0), fov, a);
-            FocusedCamera = new Camera(new Point3D(0, 10.0f, BALL_START_Z - 5f), ball.Position, new Point3D(0, 1, 0), fov, a);
+            FocusedCamera = new Camera(new Point3D(0, 10.0f, BALL_START_Z - 5.0f), ball.Position, new Point3D(0, 1, 0), fov, a);
             MovingCamera = new Camera(new Point3D(0, ball.Position.Y + MOVING_CAM_DIST_Y, ball.Position.Z - MOVING_CAM_DIST_Z), ball.Position, new Point3D(0, 1, 0), fov, a);
 
             //Set light sources
             DirectionalLight = new DirectionalLightSource(new Point3D(0, -1, 1)) { IsOn = true };
-            Reflector = new SpotLightSource(new Point3D(0, 25, -15), new Point3D(0, 0, 15), Color.White) { IsOn = false };
+            Reflector = new SpotLightSource(new Point3D(0, 10.0f, -5.0f), new Point3D(0, -1, 0), Color.White) { IsOn = false };
             PointLight = new PointLightSource(new Point3D(5.0f, 15.0f, -5.0f), Color.White) { IsOn = false };
 
             //Passing objects to render device 
@@ -312,14 +312,17 @@ namespace Drawing3D
         private void cbDirectional_CheckedChanged(object sender, EventArgs e)
         {
             DirectionalLight.IsOn = (sender as CheckBox).Checked;
+            RenderDevice.UpdateBitmap();
         }
         private void cbReflector_CheckedChanged(object sender, EventArgs e)
         {
             Reflector.IsOn = (sender as CheckBox).Checked;
+            RenderDevice.UpdateBitmap();
         }
         private void cbPointLight_CheckedChanged(object sender, EventArgs e)
         {
             PointLight.IsOn = (sender as CheckBox).Checked;
+            RenderDevice.UpdateBitmap();
         }
         private void numericUpDown_ValueChanged(object sender, EventArgs e)
         {
