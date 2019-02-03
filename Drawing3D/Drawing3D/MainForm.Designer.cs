@@ -35,6 +35,7 @@
             this.cbReflector = new System.Windows.Forms.CheckBox();
             this.cbDirectional = new System.Windows.Forms.CheckBox();
             this.gbCamera = new System.Windows.Forms.GroupBox();
+            this.rbStaticBackCamera = new System.Windows.Forms.RadioButton();
             this.rbMovingCamera = new System.Windows.Forms.RadioButton();
             this.rbFocusedCamera = new System.Windows.Forms.RadioButton();
             this.rbStaticFrontCamera = new System.Windows.Forms.RadioButton();
@@ -45,7 +46,8 @@
             this.gbFov = new System.Windows.Forms.GroupBox();
             this.numericUpDown = new System.Windows.Forms.NumericUpDown();
             this.pictureBox = new System.Windows.Forms.PictureBox();
-            this.rbStaticBackCamera = new System.Windows.Forms.RadioButton();
+            this.gbAnimation = new System.Windows.Forms.GroupBox();
+            this.btnAnimation = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -57,6 +59,7 @@
             this.gbFov.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
+            this.gbAnimation.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer
@@ -84,14 +87,16 @@
             this.tableLayoutPanel.Controls.Add(this.gbCamera, 0, 0);
             this.tableLayoutPanel.Controls.Add(this.gbShading, 0, 1);
             this.tableLayoutPanel.Controls.Add(this.gbFov, 0, 3);
+            this.tableLayoutPanel.Controls.Add(this.gbAnimation, 0, 4);
             this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel.Name = "tableLayoutPanel";
-            this.tableLayoutPanel.RowCount = 4;
+            this.tableLayoutPanel.RowCount = 5;
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel.Size = new System.Drawing.Size(130, 562);
             this.tableLayoutPanel.TabIndex = 0;
             // 
@@ -156,6 +161,18 @@
             this.gbCamera.TabIndex = 6;
             this.gbCamera.TabStop = false;
             this.gbCamera.Text = "Camera";
+            // 
+            // rbStaticBackCamera
+            // 
+            this.rbStaticBackCamera.AutoSize = true;
+            this.rbStaticBackCamera.Location = new System.Drawing.Point(7, 43);
+            this.rbStaticBackCamera.Name = "rbStaticBackCamera";
+            this.rbStaticBackCamera.Size = new System.Drawing.Size(85, 17);
+            this.rbStaticBackCamera.TabIndex = 3;
+            this.rbStaticBackCamera.TabStop = true;
+            this.rbStaticBackCamera.Text = "Static (back)";
+            this.rbStaticBackCamera.UseVisualStyleBackColor = true;
+            this.rbStaticBackCamera.CheckedChanged += new System.EventHandler(this.rbStaticBackCamera_CheckedChanged);
             // 
             // rbMovingCamera
             // 
@@ -243,10 +260,10 @@
             // gbFov
             // 
             this.gbFov.Controls.Add(this.numericUpDown);
-            this.gbFov.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbFov.Dock = System.Windows.Forms.DockStyle.Top;
             this.gbFov.Location = new System.Drawing.Point(3, 314);
             this.gbFov.Name = "gbFov";
-            this.gbFov.Size = new System.Drawing.Size(124, 264);
+            this.gbFov.Size = new System.Drawing.Size(124, 41);
             this.gbFov.TabIndex = 15;
             this.gbFov.TabStop = false;
             this.gbFov.Text = "Fov";
@@ -256,7 +273,7 @@
             this.numericUpDown.Dock = System.Windows.Forms.DockStyle.Top;
             this.numericUpDown.Location = new System.Drawing.Point(3, 16);
             this.numericUpDown.Maximum = new decimal(new int[] {
-            180,
+            120,
             0,
             0,
             0});
@@ -284,17 +301,26 @@
             this.pictureBox.TabIndex = 1;
             this.pictureBox.TabStop = false;
             // 
-            // rbStaticBackCamera
+            // gbAnimation
             // 
-            this.rbStaticBackCamera.AutoSize = true;
-            this.rbStaticBackCamera.Location = new System.Drawing.Point(7, 43);
-            this.rbStaticBackCamera.Name = "rbStaticBackCamera";
-            this.rbStaticBackCamera.Size = new System.Drawing.Size(85, 17);
-            this.rbStaticBackCamera.TabIndex = 3;
-            this.rbStaticBackCamera.TabStop = true;
-            this.rbStaticBackCamera.Text = "Static (back)";
-            this.rbStaticBackCamera.UseVisualStyleBackColor = true;
-            this.rbStaticBackCamera.CheckedChanged += new System.EventHandler(this.rbStaticBackCamera_CheckedChanged);
+            this.gbAnimation.Controls.Add(this.btnAnimation);
+            this.gbAnimation.Location = new System.Drawing.Point(3, 361);
+            this.gbAnimation.Name = "gbAnimation";
+            this.gbAnimation.Size = new System.Drawing.Size(124, 198);
+            this.gbAnimation.TabIndex = 16;
+            this.gbAnimation.TabStop = false;
+            this.gbAnimation.Text = "Animation";
+            // 
+            // btnAnimation
+            // 
+            this.btnAnimation.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnAnimation.Location = new System.Drawing.Point(3, 16);
+            this.btnAnimation.Name = "btnAnimation";
+            this.btnAnimation.Size = new System.Drawing.Size(118, 23);
+            this.btnAnimation.TabIndex = 0;
+            this.btnAnimation.Text = "Start/Stop";
+            this.btnAnimation.UseVisualStyleBackColor = true;
+            this.btnAnimation.Click += new System.EventHandler(this.btnAnimation_Click);
             // 
             // MainForm
             // 
@@ -321,6 +347,7 @@
             this.gbFov.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
+            this.gbAnimation.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -345,6 +372,8 @@
         private System.Windows.Forms.CheckBox cbReflector;
         private System.Windows.Forms.CheckBox cbPointLight;
         private System.Windows.Forms.RadioButton rbStaticBackCamera;
+        private System.Windows.Forms.GroupBox gbAnimation;
+        private System.Windows.Forms.Button btnAnimation;
     }
 }
 

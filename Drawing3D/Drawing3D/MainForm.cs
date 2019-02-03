@@ -102,8 +102,8 @@ namespace Drawing3D
                     bowlingPin.Rotation.Z -= (float)(2 * Math.PI);
                 RenderDevice.UpdateBitmap();
             };
-            animationTimer.Start();
 
+            RenderDevice.UpdateBitmap();
             pictureBox.Image = RenderDevice.Bitmap;
         }
 
@@ -282,6 +282,7 @@ namespace Drawing3D
             if ((sender as RadioButton).Checked)
             {
                 RenderDevice.Camera = StaticFrontCamera;
+                numericUpDown.Value = (decimal)(RenderDevice.Camera.Fov * 180 / Math.PI);
                 RenderDevice.UpdateBitmap();
             }
         }
@@ -290,6 +291,7 @@ namespace Drawing3D
             if ((sender as RadioButton).Checked)
             {
                 RenderDevice.Camera = StaticBackCamera;
+                numericUpDown.Value = (decimal)(RenderDevice.Camera.Fov * 180 / Math.PI);
                 RenderDevice.UpdateBitmap();
             }
         }
@@ -298,6 +300,7 @@ namespace Drawing3D
             if ((sender as RadioButton).Checked)
             {
                 RenderDevice.Camera = FocusedCamera;
+                numericUpDown.Value = (decimal)(RenderDevice.Camera.Fov * 180 / Math.PI);
                 RenderDevice.UpdateBitmap();
             }
         }
@@ -306,6 +309,7 @@ namespace Drawing3D
             if ((sender as RadioButton).Checked)
             {
                 RenderDevice.Camera = MovingCamera;
+                numericUpDown.Value = (decimal)(RenderDevice.Camera.Fov * 180 / Math.PI);
                 RenderDevice.UpdateBitmap();
             }
         }
@@ -328,6 +332,13 @@ namespace Drawing3D
         {
             RenderDevice.Camera.ChangeFov((float)(((int)(sender as NumericUpDown).Value) * Math.PI / 180));
             RenderDevice.UpdateBitmap();
+        }
+        private void btnAnimation_Click(object sender, EventArgs e)
+        {
+            if (animationTimer.Enabled)
+                animationTimer.Stop();
+            else
+                animationTimer.Start();
         }
     }
 }

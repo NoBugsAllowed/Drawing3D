@@ -23,6 +23,8 @@ namespace Drawing3D
         public Shading Shading { get; set; }
         public List<Model> Models { get; set; }
         public List<LightSource> Lights { get; set; }
+        public Point3D AmbientLight { get; set; }
+        public Color BackgroundColor { get; set; }
         public Camera Camera { get; set; }
         public Bitmap Bitmap
         {
@@ -37,6 +39,8 @@ namespace Drawing3D
 
             Models = new List<Model>();
             Lights = new List<LightSource>();
+            AmbientLight = new Point3D(0.05f, 0.05f, 0.05f);
+            BackgroundColor = Color.FromArgb(0, 0, 0);
 
             Shading = Shading.Flat;
         }
@@ -57,11 +61,11 @@ namespace Drawing3D
             if (isRendering)
                 return;
 
-            Clear();
+            Clear(BackgroundColor.R, BackgroundColor.G, BackgroundColor.B);
             Render(Camera, Models);
             Present();
         }
-        public void Clear(byte r = 0, byte g = 0, byte b = 0, byte a = 255)
+        private void Clear(byte r = 0, byte g = 0, byte b = 0, byte a = 255)
         {
             for (var index = 0; index < backBuffer.Length; index += 4)
             {
@@ -76,7 +80,7 @@ namespace Drawing3D
                 depthBuffer[index] = float.MaxValue;
             }
         }
-        public void Render(Camera camera, List<Model> modelList)
+        private void Render(Camera camera, List<Model> modelList)
         {
             //Prevent from flickering
             if (isRendering)
@@ -91,20 +95,7 @@ namespace Drawing3D
                 Matrix4x4 rotationMatrix = Matrices.RotationX(model.Mesh.Rotation.X) * Matrices.RotationY(model.Mesh.Rotation.Y) * Matrices.RotationZ(model.Mesh.Rotation.Z);
                 Matrix4x4 modelMatrix = Matrices.Translation(model.Mesh.Position) * rotationMatrix;
 
-                //Parallel.ForEach(model.Mesh.Faces, face =>
-                //{
-                //    Vertice v1 = model.Mesh.Vertices[face.A].Clone();
-                //    Vertice v2 = model.Mesh.Vertices[face.B].Clone();
-                //    Vertice v3 = model.Mesh.Vertices[face.C].Clone();
-
-                //    //Calculate position in global coords, position on bitmap and normal vectors for each vertice
-                //    v1.CalculateCoordinates(modelMatrix, view, projection, renderWidth, renderHeight);
-                //    v2.CalculateCoordinates(modelMatrix, view, projection, renderWidth, renderHeight);
-                //    v3.CalculateCoordinates(modelMatrix, view, projection, renderWidth, renderHeight);
-
-                //    FillTriangle(v1, v2, v3, face.Color, Shading);
-                //});
-                foreach(Face face in model.Mesh.Faces)
+                Parallel.ForEach(model.Mesh.Faces, face =>
                 {
                     Vertice v1 = model.Mesh.Vertices[face.A].Clone();
                     Vertice v2 = model.Mesh.Vertices[face.B].Clone();
@@ -116,11 +107,11 @@ namespace Drawing3D
                     v3.CalculateCoordinates(modelMatrix, rotationMatrix, view, projection, renderWidth, renderHeight);
 
                     FillTriangle(v1, v2, v3, face.Color, Shading);
-                }
+                });
             }
             isRendering = false;
         }
-        public void Present()
+        private void Present()
         {
             //Write data to bitmap
             using (var stream = new MemoryStream(bitmap.Bits))
@@ -130,7 +121,7 @@ namespace Drawing3D
             pictureBox.Image = Bitmap;
         }
 
-        public void SetPixel(int x, int y, float z, Color col)
+        private void SetPixel(int x, int y, float z, Color col)
         {
             int index = (x + y * renderWidth);
             int index4 = index * 4;
@@ -146,7 +137,7 @@ namespace Drawing3D
             backBuffer[index4 + 2] = col.R;
             backBuffer[index4 + 3] = col.A;
         }
-        public void DrawLine(Point3D p1, Point3D p2, Color color)
+        private void DrawLine(Point3D p1, Point3D p2, Color color)
         {
             int x = (int)p1.X, y = (int)p1.Y, w = (int)(p2.X - p1.X), h = (int)(p2.Y - p1.Y);
             int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
@@ -181,7 +172,7 @@ namespace Drawing3D
                 }
             }
         }
-        public void FillTriangle(Vertice v1, Vertice v2, Vertice v3, Color col, Shading shading = Shading.Flat)
+        private void FillTriangle(Vertice v1, Vertice v2, Vertice v3, Color col, Shading shading = Shading.Flat)
         {
             Vertice t;
             //Sort vertices
@@ -240,7 +231,7 @@ namespace Drawing3D
                 //Calculate color only once for tringle center
                 Point3D point = (v1.ScenePosition + v2.ScenePosition + v3.ScenePosition) / 3;
                 Point3D normal = (v1.N + v2.N + v3.N) / 3;
-                col = PhongLightingModel.CalculateColor(ks, kd, ka, point, normal, Camera.Position, Lights, new Point3D(0, 0, 0), 1);
+                col = PhongLightingModel.CalculateColor(ks, kd, ka, point, normal, Camera.Position, Lights, AmbientLight, 1);
 
                 if (m1 > m2)
                 {
@@ -281,9 +272,9 @@ namespace Drawing3D
             else if (shading == Shading.Gouraud)
             {
                 //Calculate color for each vertice and then interpolate color for each pixel
-                colDown = PhongLightingModel.CalculateColor(ks, kd, ka, v1.Position, v1.N, Camera.Position, Lights, new Point3D(0, 0, 0), 1);
-                colMid = PhongLightingModel.CalculateColor(ks, kd, ka, v2.Position, v2.N, Camera.Position, Lights, new Point3D(0, 0, 0), 1);
-                colUp = PhongLightingModel.CalculateColor(ks, kd, ka, v3.Position, v3.N, Camera.Position, Lights, new Point3D(0, 0, 0), 1);
+                colDown = PhongLightingModel.CalculateColor(ks, kd, ka, v1.Position, v1.N, Camera.Position, Lights, AmbientLight, 1);
+                colMid = PhongLightingModel.CalculateColor(ks, kd, ka, v2.Position, v2.N, Camera.Position, Lights, AmbientLight, 1);
+                colUp = PhongLightingModel.CalculateColor(ks, kd, ka, v3.Position, v3.N, Camera.Position, Lights, AmbientLight, 1);
 
                 if (m1 > m2)
                 {
@@ -362,7 +353,7 @@ namespace Drawing3D
             }
         }
 
-        public void ProcessScanLine(int y, Point3D pa, Point3D pb, Point3D pc, Point3D pd, Color color)
+        private void ProcessScanLine(int y, Point3D pa, Point3D pb, Point3D pc, Point3D pd, Color color)
         {
             var gradient1 = pa.Y != pb.Y ? (y - pa.Y) / (pb.Y - pa.Y) : 1;
             var gradient2 = pc.Y != pd.Y ? (y - pc.Y) / (pd.Y - pc.Y) : 1;
@@ -382,7 +373,7 @@ namespace Drawing3D
                 SetPixel(x, y, z, color);
             }
         }
-        public void ProcessScanLineGouraud(int y, Point3D pa, Point3D pb, Point3D pc, Point3D pd, Color ca, Color cb, Color cc, Color cd)
+        private void ProcessScanLineGouraud(int y, Point3D pa, Point3D pb, Point3D pc, Point3D pd, Color ca, Color cb, Color cc, Color cd)
         {
             var gradient1 = pa.Y != pb.Y ? (y - pa.Y) / (pb.Y - pa.Y) : 1;
             var gradient2 = pc.Y != pd.Y ? (y - pc.Y) / (pd.Y - pc.Y) : 1;
@@ -414,7 +405,7 @@ namespace Drawing3D
                 SetPixel(x, y, z, Color.FromArgb(r, g, b));
             }
         }
-        public void ProcessScanLinePhong(int y, Vertice va, Vertice vb, Vertice vc, Vertice vd, Color col)
+        private void ProcessScanLinePhong(int y, Vertice va, Vertice vb, Vertice vc, Vertice vd, Color col)
         {
             Point3D pa = va.ProjectedPosition;
             Point3D pb = vb.ProjectedPosition;
@@ -467,15 +458,15 @@ namespace Drawing3D
 
                 Point3D n = new Point3D(nx, ny, nz);
                 n /= n.DistanceFromOrigin();
-                SetPixel(x, y, z, PhongLightingModel.CalculateColor(ks, kd, ka, new Point3D(px, py, pz), n, Camera.Position, Lights, new Point3D(0, 0, 0), 1));
+                SetPixel(x, y, z, PhongLightingModel.CalculateColor(ks, kd, ka, new Point3D(px, py, pz), n, Camera.Position, Lights, AmbientLight, 1));
             }
         }
 
-        float Clamp(float value, float min = 0, float max = 1)
+        private float Clamp(float value, float min = 0, float max = 1)
         {
             return Math.Max(min, Math.Min(value, max));
         }
-        float Interpolate(float min, float max, float gradient)
+        private float Interpolate(float min, float max, float gradient)
         {
             return min + (max - min) * Clamp(gradient);
         }
