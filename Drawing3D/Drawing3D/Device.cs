@@ -272,9 +272,9 @@ namespace Drawing3D
             else if (shading == Shading.Gouraud)
             {
                 //Calculate color for each vertice and then interpolate color for each pixel
-                colDown = PhongLightingModel.CalculateColor(ks, kd, ka, v1.Position, v1.N, Camera.Position, Lights, AmbientLight, 1);
-                colMid = PhongLightingModel.CalculateColor(ks, kd, ka, v2.Position, v2.N, Camera.Position, Lights, AmbientLight, 1);
-                colUp = PhongLightingModel.CalculateColor(ks, kd, ka, v3.Position, v3.N, Camera.Position, Lights, AmbientLight, 1);
+                colDown = PhongLightingModel.CalculateColor(ks, kd, ka, v1.ScenePosition, v1.N, Camera.Position, Lights, AmbientLight, 1);
+                colMid = PhongLightingModel.CalculateColor(ks, kd, ka, v2.ScenePosition, v2.N, Camera.Position, Lights, AmbientLight, 1);
+                colUp = PhongLightingModel.CalculateColor(ks, kd, ka, v3.ScenePosition, v3.N, Camera.Position, Lights, AmbientLight, 1);
 
                 if (m1 > m2)
                 {
